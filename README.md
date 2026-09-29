@@ -69,11 +69,23 @@ python tests/test_multifidelity_pretraining.py
 python tests/test_smex02_reader.py
 ```
 
-Dependencies are declared in `pyproject.toml`. Install `python -m pip install -e '.[raw]'` for HDF5, raster and legacy Excel readers. The original recorded runtime
-was Windows/Python 3.11.15 (`requirements-lock-windows-py311.txt`); an earlier
-scientific validation used Linux/Python 3.13.5
-(`requirements-validation-linux-py313.txt`). These files document their respective
-environments rather than impose both environments on a new installation.
+Dependencies are declared in `pyproject.toml`. Install
+`python -m pip install -e '.[raw]'` for HDF5, raster and legacy Excel readers.
+The core versions recorded for the original experiment and the earlier
+numerical validation are:
+
+| Component | Original Windows experiment | Linux numerical validation |
+| --- | --- | --- |
+| Python | 3.11.15 | 3.13.5 |
+| NumPy | 2.4.6 | 2.3.5 |
+| SciPy | 1.17.1 | 1.17.0 |
+| pandas | 3.0.5 | 2.2.3 |
+| scikit-learn | 1.9.0 | 1.8.0 |
+| Matplotlib | 3.11.1 | 3.10.8 |
+| threadpoolctl | 3.6.0 | 3.6.0 |
+
+These are records of separate environments, not combined installation
+requirements or a complete environment lock.
 The 0.2.2 cleanup was checked with macOS/Python 3.11.4, including tests,
 frozen-result recalculation, matched-information evaluation, panel rendering
 and a short training check. The original Windows environment was not restored.
@@ -168,10 +180,75 @@ trends and dielectric-loss sensitivity before new pretraining. I²EM-minus-SPM
 differences quantify teacher disagreement, not observational error. External
 reference-solver code is not distributed here.
 
+## Contributing
+
+Use focused changes and run the checks listed above. Add or update contract tests
+when changing a data reader, physical model or metric, and describe changes to
+sample definitions, seeds, splits, units and aggregation rules in the pull request.
+Write new experiments to fresh output directories; preserve frozen results.
+Keep raw third-party data, credentials, local absolute paths and generated outputs
+out of commits. Distinguish exploratory work from locked or preregistered
+evaluation; results already observed in the target campaign cannot be relabeled
+as prospective.
+
 ## Citation and licensing
 
-Use [CITATION.cff](CITATION.cff) for the software and cite the original products
-above. Code is BSD-3-Clause. Original project-derived artifacts are CC BY 4.0
-where contributors hold the necessary rights. Third-party products retain
-their own terms and required citations; see [data licensing](LICENSE-DATA.md)
-and [third-party notices](THIRD_PARTY_NOTICES.md).
+Cite the software as:
+
+> Chengyue Huang, Pan Xiong, Jing Liu, Roberto Battiston, Angelo De Santis,
+> and Xuhui Shen (2026). *L-band Physics Pretraining: Multi-Fidelity
+> Rough-Surface Scattering*, version 0.2.2, released 2026-09-29.
+> https://github.com/PANXIONG-CN/lband-physics-pretraining
+
+Also cite the original observation products listed above.
+
+### Data and third-party terms
+
+Unless a file states otherwise, original project-derived tables, numerical
+summaries and figures under `reproducibility/` are licensed under
+[Creative Commons Attribution 4.0 International](https://creativecommons.org/licenses/by/4.0/legalcode)
+(CC BY 4.0), where contributors hold the necessary rights. Cite the software
+and relevant source products when reusing these artifacts.
+
+NASA/NSIDC observations retain their original terms and required citations.
+The I²EM MATLAB reference source used by this project contained no explicit
+redistribution license and is excluded from the repository. Only wrappers,
+interface checks and frozen request/result tables are distributed; obtain a
+properly licensed compatible solver separately. No third-party data or software
+is relicensed by this repository.
+
+### Code license
+
+The following BSD-3-Clause license applies to original project code:
+
+```text
+BSD 3-Clause License
+
+Copyright (c) 2026, research-pilots contributors
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its
+   contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+```
