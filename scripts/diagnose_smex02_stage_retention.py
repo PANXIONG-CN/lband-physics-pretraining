@@ -225,7 +225,7 @@ def main() -> None:
     import evaluate_multifidelity_pretraining as multi
 
     common_path = root / "reproducibility/results/common_cohort/predictions.csv"
-    physics_path = root / "reproducibility/results/advisor_final/stage_retention/stage_predictions.csv"
+    physics_path = root / "reproducibility/results/stage_diagnostics/stage_predictions.csv"
     spm_path = root / "reproducibility/data/teachers/spm_pretraining.csv"
     i2em_request_path = root / "reproducibility/data/teachers/i2em_train_requests.csv"
     i2em_result_path = root / "reproducibility/data/teachers/i2em_train_results.csv"

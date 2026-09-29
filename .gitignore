@@ -19,3 +19,7 @@ manuscript/
 *.fdb_latexmk
 *.xdv
 *.synctex.gz
+*.out
+*.bbl
+*.blg
+.DS_Store

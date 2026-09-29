@@ -7,7 +7,6 @@ The trajectory reconstruction is handled by verify_stage_continuity.py.
 """
 from __future__ import annotations
 import argparse
-import hashlib
 import json
 from collections import Counter
 from pathlib import Path
@@ -21,6 +20,25 @@ FEATURES = ['soil_moisture_m3_m3', 'soil_real_dielectric',
 STAGES = ['i2em_fixed40_teacher', 'pretraining_only_surrogate',
           'source_finetuned_surrogate', 'risk_shrunk_surrogate',
           'i2em_actual_angle_control']
+
+
+def read_table(path, required=(), unique_key=()):
+    """Read a required input and validate its schema without a checksum file."""
+    path = Path(path)
+    if not path.is_file():
+        raise FileNotFoundError(f'Required paper input is missing: {path}')
+    frame = pd.read_csv(path)
+    missing = sorted(set(required).union(unique_key).difference(frame.columns))
+    if missing:
+        raise ValueError(f'{path}: missing required columns {missing}')
+    if frame.empty:
+        raise ValueError(f'{path}: input table is empty')
+    if 'acquisition_date' in frame:
+        frame['acquisition_date'] = pd.to_datetime(frame.acquisition_date).dt.strftime('%Y-%m-%d')
+    if unique_key and (frame[list(unique_key)].isna().any().any()
+                       or frame.duplicated(list(unique_key)).any()):
+        raise ValueError(f'{path}: missing or duplicate sample keys {list(unique_key)}')
+    return frame
 
 
 def component_metrics(y, p):
@@ -106,39 +124,29 @@ def main():
         raise ValueError('Write audit results outside the immutable input bundle')
     out.mkdir(parents=True, exist_ok=True)
 
-    def csv(rel):
-        p = root/rel
-        if not p.is_file():
-            raise FileNotFoundError(p)
-        df = pd.read_csv(p)
-        if 'acquisition_date' in df:
-            df['acquisition_date'] = pd.to_datetime(df.acquisition_date).dt.strftime('%Y-%m-%d')
-        return df
+    checked_inputs = set()
+
+    def csv(rel, required=(), unique_key=()):
+        frame = read_table(root/rel, required, unique_key)
+        checked_inputs.add(rel)
+        return frame
 
     def save(df, name):
         df.to_csv(out/name, index=False)
 
     files = [p for p in root.rglob('*') if p.is_file()]
-    integ = []
-    for row in csv('sha256_manifest.csv').to_dict('records'):
-        p = root/row['path']
-        if not p.exists():
-            p = root.parent/row['path']
-        if not p.is_file():
-            raise FileNotFoundError(p)
-        integ.append({'path': row['path'], 'bytes_match': p.stat().st_size == row['bytes'],
-                      'sha256_match': hashlib.sha256(p.read_bytes()).hexdigest() == row['sha256']})
-    assert all(x['bytes_match'] and x['sha256_match'] for x in integ)
-    save(pd.DataFrame(integ), 'file_integrity.csv')
-
-    src = csv('data/source/smapvex12_portable_source.csv')
-    tgt = csv('data/target/smex02_field_day_model_ready.csv')
-    zero = csv('results/cross_domain/zero_shot_predictions.csv')
-    held = csv('results/cross_domain/heldout_predictions.csv')
-    assignments = csv('results/cross_domain/field_split_assignments.csv')
-    common = csv('results/common_cohort/predictions.csv')
-    stage = csv('results/advisor_final/stage_retention/stage_predictions.csv')
-    offset = csv('results/advisor_final/physics_offset_control/heldout_common_predictions.csv')
+    src = csv('data/source/smapvex12_portable_source.csv', FEATURES+YCOL, KEY)
+    tgt = csv('data/target/smex02_field_day_model_ready.csv', FEATURES+YCOL, KEY)
+    zero = csv('results/cross_domain/zero_shot_predictions.csv', FEATURES+YCOL, KEY)
+    split_key = ['split_repeat', 'requested_fraction']
+    held = csv('results/cross_domain/heldout_predictions.csv', YCOL, split_key+KEY)
+    assignments = csv('results/cross_domain/field_split_assignments.csv', ['role'], split_key+['field_id'])
+    common = csv('results/common_cohort/predictions.csv', FEATURES+YCOL, KEY)
+    stage = csv('results/stage_diagnostics/stage_predictions.csv', FEATURES+YCOL+['differential_'+m for m in STAGES], KEY)
+    offset = csv('results/offset_diagnostics/heldout_common_predictions.csv', YCOL, split_key+KEY)
+    for label, frame, count in [('source',src,240),('target',tgt,189),('zero-shot',zero,189),('common',common,138),('stage',stage,138)]:
+        if len(frame) != count:
+            raise ValueError(f'Expected {count} published {label} samples, found {len(frame)}')
     cohorts = []
     for name, df in [('source', src), ('target', tgt), ('zero', zero),
                      ('common', common), ('stage', stage)]:
@@ -157,15 +165,16 @@ def main():
         joinchecks.append({'table': name, 'observation_max_absolute_difference': err})
     save(pd.DataFrame(joinchecks), 'cross_file_observation_checks.csv')
 
-    tr, te = csv('data/teachers/i2em_train_requests.csv'), csv('data/teachers/i2em_test_requests.csv')
+    tr, te = (csv(f'data/teachers/i2em_{split}_requests.csv', FEATURES+['i2em_request_valid'], ['request_id']) for split in ['train','test'])
     assert not set(tr.request_id)&set(te.request_id)
     assert not set(map(tuple, tr[FEATURES].values))&set(map(tuple, te[FEATURES].values))
     assert not tr.duplicated(FEATURES).any() and not te.duplicated(FEATURES).any()
     assert tr.i2em_request_valid.all() and te.i2em_request_valid.all()
     for split, req in [('train', tr), ('test', te)]:
-        values = csv(f'data/teachers/i2em_{split}_results.csv')
+        values = csv(f'data/teachers/i2em_{split}_results.csv', ['i2em_hh_db','i2em_vv_db'], ['request_id'])
         assert set(req.request_id) == set(values.request_id)
         assert values.request_id.is_unique
+        assert np.isfinite(values[['i2em_hh_db','i2em_vv_db']].to_numpy(float)).all()
 
     zero_scores = []
     for c in zero:
@@ -203,7 +212,7 @@ def main():
 
     sy = stage.sigma0_vv_db-stage.sigma0_hh_db
     sm = pd.DataFrame([{'method': m, **component_metrics(sy, stage['differential_'+m])} for m in STAGES])
-    stored = csv('results/advisor_final/stage_retention/stage_metrics.csv').set_index('method')
+    stored = csv('results/stage_diagnostics/stage_metrics.csv').set_index('method')
     cols = ['bias_db', 'rmse_db', 'centered_rmse_db', 'centered_skill', 'variance_ratio']
     maxerr = float((sm.set_index('method')[cols]-stored[cols]).abs().max().max())
     assert maxerr < 1e-10
@@ -330,7 +339,8 @@ def main():
     report = {
         'scope': 'Frozen-table numerical recalculation; trajectory reconstruction and raw-data replay are separate commands',
         'input_file_count': len(files), 'input_file_extensions': dict(Counter(p.suffix for p in files)),
-        'manifest_files_verified': len(integ), 'all_hashes_match': True,
+        'input_validation': 'Required tables, schemas, sample keys, cohorts, teacher pairing and field splits; versions are tracked by Git',
+        'input_tables_checked': sorted(checked_inputs),
         'author_source_code_files': [str(p.relative_to(root)) for p in files if p.suffix in {'.py', '.m', '.ipynb', '.R', '.jl'}],
         'cohorts': cohorts, 'stage_numeric_max_difference': maxerr,
         'stage_metrics': sm.to_dict('records'), 'stage_bootstrap': pairs,
@@ -346,7 +356,7 @@ def main():
                          'Historical ordering of model/protocol selection']}
     (out/'audit_summary.json').write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding='utf-8')
     print(json.dumps({'status': 'FROZEN_RECALCULATION_COMPLETE',
-                      'files_verified': len(integ), 'source_code_files': report['author_source_code_files'],
+                      'input_tables_checked': len(checked_inputs), 'source_code_files': report['author_source_code_files'],
                       'common_comparison': report['common_comparison']}, ensure_ascii=False, indent=2))
 
 

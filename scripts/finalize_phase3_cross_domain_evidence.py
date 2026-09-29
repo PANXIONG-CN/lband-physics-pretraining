@@ -54,7 +54,7 @@ FIG_DIR = (
     / "main"
 )
 
-FIG_STEM = FIG_DIR / "Fig_phase3_target_domain_evidence"
+FIG_STEM = FIG_DIR / "fig06_few_shot_transfer"
 
 
 def read_json(path: Path) -> dict:

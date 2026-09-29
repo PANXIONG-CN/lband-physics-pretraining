@@ -294,7 +294,7 @@ def render_figure(frame: pd.DataFrame) -> Path:
     axes[1].legend(ncol=2)
 
     FIGURE_DIR.mkdir(parents=True, exist_ok=True)
-    figure_base = FIGURE_DIR / "Fig_phase2_sample_efficiency"
+    figure_base = FIGURE_DIR / "fig03_sample_efficiency"
 
     fig.savefig(
         figure_base.with_suffix(".pdf"),

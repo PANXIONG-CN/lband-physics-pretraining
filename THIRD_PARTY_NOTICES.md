@@ -6,14 +6,7 @@ The BSD 3-Clause License covers only original code written for this project.
 
 Raw SMAPVEX and SMEX products are distributed by NASA NSIDC DAAC. They are not
 part of the software license. Product identifiers, DOIs, and required
-citations are listed in `DATA.md`.
-
-## MSTAR and AdaptSAPS
-
-MSTAR public products are distributed by the AFRL Sensor Data Management
-System. This repository does not redistribute the imagery or downloaded
-archives. AdaptSAPS material in the local raw-data directory is also excluded
-from the public repository.
+citations are listed in the README.
 
 ## I2EM MATLAB reference implementation
 
@@ -22,6 +15,6 @@ contain an explicit redistribution license. It is therefore excluded from the
 public repository. The project publishes request tables, returned numerical
 teacher values, interface checks, and wrappers. To generate new I2EM labels,
 users must obtain a properly licensed compatible implementation and verify its
-input convention against `scripts/README_i2em_teacher.md`.
+input convention against the New I²EM calculations section in the README.
 
 No third-party data or software is relicensed by this repository.

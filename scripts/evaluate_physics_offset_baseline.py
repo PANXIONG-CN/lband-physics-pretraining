@@ -182,8 +182,9 @@ def save_figure(summary: pd.DataFrame, output: Path) -> None:
         ax.set_ylabel("Mean HH/VV RMSE (dB)")
         ax.legend(fontsize=8,loc="upper right")
         ax.grid(axis="y",alpha=.25)
-        fig.savefig(output/f"Fig_common_{name}.pdf",bbox_inches="tight")
-        fig.savefig(output/f"Fig_common_{name}.png",dpi=400,bbox_inches="tight")
+        stem = {'physics': 'fig04a_physics_offset', 'neural': 'fig04b_neural_transfer'}[name]
+        fig.savefig(output/f"{stem}.pdf",bbox_inches="tight")
+        fig.savefig(output/f"{stem}.png",dpi=400,bbox_inches="tight")
         plt.close(fig)
 
 
@@ -204,7 +205,7 @@ def main() -> None:
     common_path = root / "reproducibility/results/common_cohort/predictions.csv"
     split_path = root / "reproducibility/results/cross_domain/field_split_assignments.csv"
     heldout_path = root / "reproducibility/results/cross_domain/heldout_predictions.csv"
-    shrinkage_path = root / "reproducibility/results/advisor_final/physics_offset_control/risk_selected_weights.csv"
+    shrinkage_path = root / "reproducibility/results/offset_diagnostics/risk_selected_weights.csv"
     target_path = root / "reproducibility/data/target/smex02_field_day_model_ready.csv"
     input_paths = [common_path, split_path, heldout_path, shrinkage_path, target_path]
     for path in input_paths:

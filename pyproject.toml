@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "research-pilots"
-version = "0.2.1"
+version = "0.2.2"
 description = "Multi-fidelity physics pretraining for L-band rough-surface scattering forward models"
 readme = "README.md"
 requires-python = ">=3.11,<3.14"
@@ -55,5 +55,5 @@ dev = [
 where = ["src"]
 
 [tool.pytest.ini_options]
-testpaths = ["scripts"]
+testpaths = ["tests"]
 python_files = ["test_*.py"]

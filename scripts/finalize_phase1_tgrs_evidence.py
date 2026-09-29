@@ -446,7 +446,7 @@ def render_main_figure() -> dict:
     axes[1, 1].legend()
 
     FIGURE_DIR.mkdir(parents=True, exist_ok=True)
-    figure_base = FIGURE_DIR / "Fig_phase1_physics_teacher_evidence"
+    figure_base = FIGURE_DIR / "fig02_teacher_comparison"
 
     fig.savefig(
         figure_base.with_suffix(".pdf"),

@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-message: "Please cite this software companion and the original data products listed in DATA.md."
+message: "Please cite this software companion and the original data products listed in the README."
 title: "L-band Physics Pretraining: Multi-Fidelity Rough-Surface Scattering"
 type: software
 authors:
@@ -21,6 +21,6 @@ keywords:
   - rough-surface scattering
   - physics-guided machine learning
   - multi-fidelity learning
-version: 0.2.1
+version: 0.2.2
 date-released: 2026-09-29
 repository-code: "https://github.com/PANXIONG-CN/lband-physics-pretraining"

@@ -74,7 +74,7 @@ def main():
     members.to_csv(out/'predictions_by_member.csv',index=False)
     ens=members.groupby(['field_id','acquisition_date'],as_index=False)[['d_pretraining','d_source','d_risk','d_risk_reselected']].mean()
     frozen=pd.read_csv(data/'results/cross_domain/zero_shot_predictions.csv',dtype={'field_id':str})
-    stage=pd.read_csv(data/'results/advisor_final/stage_retention/stage_predictions.csv',dtype={'field_id':str})
+    stage=pd.read_csv(data/'results/stage_diagnostics/stage_predictions.csv',dtype={'field_id':str})
     joined=ens.merge(frozen,on=['field_id','acquisition_date'],validate='one_to_one');checks=[]
     for m,prefix in [('d_source','spm_to_i2em'),('d_risk','risk_spm_to_i2em'),('d_risk_reselected','risk_spm_to_i2em')]:
       diff=joined[m].to_numpy()-(joined[f'vv_{prefix}']-joined[f'hh_{prefix}']).to_numpy()

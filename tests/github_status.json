@@ -1,7 +1,0 @@
-{
-  "account": "PANXIONG-CN",
-  "requested_repository": "PANXIONG-CN/lband-physics-pretraining",
-  "repository_read_http_status": 404,
-  "publication_completed": false,
-  "reason": "The connected tools can write to an existing repository but expose no create-repository operation; no authenticated gh CLI is available in this runtime."
-}

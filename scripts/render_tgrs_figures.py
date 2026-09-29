@@ -931,7 +931,7 @@ def plot_fig06(
 
     save_figure(
         fig,
-        output / "main/Fig06_campaign_diagnostics",
+        output / "main/figS07_campaign_distributions",
         figures,
     )
 
@@ -1050,7 +1050,7 @@ def plot_figs01(
 
     save_figure(
         fig,
-        output / "supplementary/FigS01_spm_angle_loss_scan",
+        output / "supplementary/figS01_angle_loss",
         figures,
     )
 
@@ -1312,7 +1312,7 @@ def plot_figs03(
 
     save_figure(
         fig,
-        output / "supplementary/FigS03_dielectric_sensitivity",
+        output / "supplementary/figS03_dielectric_sensitivity",
         figures,
     )
 
@@ -1458,7 +1458,7 @@ def plot_figs04(
 
     save_figure(
         fig,
-        output / "supplementary/FigS04_controlled_mismatch",
+        output / "supplementary/figS04_controlled_mismatch",
         figures,
     )
 
@@ -1775,7 +1775,7 @@ def plot_figs06(
 
     save_figure(
         fig,
-        output / "supplementary/FigS06_teacher_effective_domain",
+        output / "supplementary/figS06_teacher_domain",
         figures,
     )
 
