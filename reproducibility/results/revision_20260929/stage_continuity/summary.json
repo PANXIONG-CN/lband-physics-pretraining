@@ -1,0 +1,211 @@
+{
+  "status": "COMPLETE",
+  "role": "post-hoc trajectory reconstruction; no target selection",
+  "atol_db": 1e-08,
+  "checks": [
+    {
+      "comparison": "d_pretraining",
+      "rows": 138,
+      "max_abs_difference_db": 1.7763568394002505e-15,
+      "rmse_difference_db": 4.972258850894249e-16,
+      "pass_atol": true
+    },
+    {
+      "comparison": "d_source",
+      "rows": 189,
+      "max_abs_difference_db": 1.4654943925052066e-14,
+      "rmse_difference_db": 4.5696203530161476e-15,
+      "pass_atol": true
+    },
+    {
+      "comparison": "d_risk",
+      "rows": 189,
+      "max_abs_difference_db": 5.551115123125783e-15,
+      "rmse_difference_db": 2.009223089106689e-15,
+      "pass_atol": true
+    },
+    {
+      "comparison": "d_risk_reselected",
+      "rows": 189,
+      "max_abs_difference_db": 0.06407008597144503,
+      "rmse_difference_db": 0.033085839933912294,
+      "pass_atol": false
+    }
+  ],
+  "selected_weights_reproduced": false,
+  "original_windows_environment_recreated": false,
+  "environment": {
+    "python": "3.13.5",
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+    "numpy": "2.3.5",
+    "scipy": "1.17.0",
+    "pandas": "2.2.3",
+    "scikit-learn": "1.8.0",
+    "threadpoolctl": "3.6.0"
+  },
+  "elapsed_seconds": 8.132476542000006,
+  "members": [
+    {
+      "repeat": 1,
+      "seed": 20260910,
+      "selected_weight": 0.0,
+      "spm": {
+        "learning_rate_init_attribute": 0.003,
+        "optimizer_learning_rate_init": 0.003,
+        "optimizer_t": 4200,
+        "samples_seen": 819200,
+        "batch_size": "auto",
+        "shuffle": false
+      },
+      "i2em": {
+        "learning_rate_init_attribute": 0.001,
+        "optimizer_learning_rate_init": 0.003,
+        "optimizer_t": 4400,
+        "samples_seen": 844800,
+        "batch_size": "auto",
+        "shuffle": false
+      },
+      "source": {
+        "learning_rate_init_attribute": 0.001,
+        "optimizer_learning_rate_init": 0.003,
+        "optimizer_t": 4640,
+        "samples_seen": 873600,
+        "batch_size": "auto",
+        "shuffle": false
+      },
+      "scalers_fixed": true
+    },
+    {
+      "repeat": 2,
+      "seed": 20360910,
+      "selected_weight": 0.0,
+      "spm": {
+        "learning_rate_init_attribute": 0.003,
+        "optimizer_learning_rate_init": 0.003,
+        "optimizer_t": 4200,
+        "samples_seen": 819200,
+        "batch_size": "auto",
+        "shuffle": false
+      },
+      "i2em": {
+        "learning_rate_init_attribute": 0.001,
+        "optimizer_learning_rate_init": 0.003,
+        "optimizer_t": 4400,
+        "samples_seen": 844800,
+        "batch_size": "auto",
+        "shuffle": false
+      },
+      "source": {
+        "learning_rate_init_attribute": 0.001,
+        "optimizer_learning_rate_init": 0.003,
+        "optimizer_t": 4640,
+        "samples_seen": 873600,
+        "batch_size": "auto",
+        "shuffle": false
+      },
+      "scalers_fixed": true
+    },
+    {
+      "repeat": 3,
+      "seed": 20460910,
+      "selected_weight": 0.0,
+      "spm": {
+        "learning_rate_init_attribute": 0.003,
+        "optimizer_learning_rate_init": 0.003,
+        "optimizer_t": 4200,
+        "samples_seen": 819200,
+        "batch_size": "auto",
+        "shuffle": false
+      },
+      "i2em": {
+        "learning_rate_init_attribute": 0.001,
+        "optimizer_learning_rate_init": 0.003,
+        "optimizer_t": 4400,
+        "samples_seen": 844800,
+        "batch_size": "auto",
+        "shuffle": false
+      },
+      "source": {
+        "learning_rate_init_attribute": 0.001,
+        "optimizer_learning_rate_init": 0.003,
+        "optimizer_t": 4640,
+        "samples_seen": 873600,
+        "batch_size": "auto",
+        "shuffle": false
+      },
+      "scalers_fixed": true
+    },
+    {
+      "repeat": 4,
+      "seed": 20560910,
+      "selected_weight": 0.0,
+      "spm": {
+        "learning_rate_init_attribute": 0.003,
+        "optimizer_learning_rate_init": 0.003,
+        "optimizer_t": 4200,
+        "samples_seen": 819200,
+        "batch_size": "auto",
+        "shuffle": false
+      },
+      "i2em": {
+        "learning_rate_init_attribute": 0.001,
+        "optimizer_learning_rate_init": 0.003,
+        "optimizer_t": 4400,
+        "samples_seen": 844800,
+        "batch_size": "auto",
+        "shuffle": false
+      },
+      "source": {
+        "learning_rate_init_attribute": 0.001,
+        "optimizer_learning_rate_init": 0.003,
+        "optimizer_t": 4640,
+        "samples_seen": 873600,
+        "batch_size": "auto",
+        "shuffle": false
+      },
+      "scalers_fixed": true
+    },
+    {
+      "repeat": 5,
+      "seed": 20660910,
+      "selected_weight": 0.0,
+      "spm": {
+        "learning_rate_init_attribute": 0.003,
+        "optimizer_learning_rate_init": 0.003,
+        "optimizer_t": 4200,
+        "samples_seen": 819200,
+        "batch_size": "auto",
+        "shuffle": false
+      },
+      "i2em": {
+        "learning_rate_init_attribute": 0.001,
+        "optimizer_learning_rate_init": 0.003,
+        "optimizer_t": 4400,
+        "samples_seen": 844800,
+        "batch_size": "auto",
+        "shuffle": false
+      },
+      "source": {
+        "learning_rate_init_attribute": 0.001,
+        "optimizer_learning_rate_init": 0.003,
+        "optimizer_t": 4640,
+        "samples_seen": 873600,
+        "batch_size": "auto",
+        "shuffle": false
+      },
+      "scalers_fixed": true
+    }
+  ],
+  "inputs": {
+    "reproducibility/data/source/smapvex12_portable_source.csv": "7b52a128dfbdd49c6270bc80203227cb63daa7f7e312a1f40a50c6ecbe15e785",
+    "reproducibility/data/target/smex02_field_day_model_ready.csv": "e984a1cf6b39a35f28e3087b7f13f22e7aaf0de0a3a4b2e843b7dc00f44fb408",
+    "reproducibility/data/teachers/spm_pretraining.csv": "2c8f6ffd86a6be9358d3838336513060e184f813757278a1ba579a0dfedc3657",
+    "reproducibility/data/teachers/i2em_train_requests.csv": "15d39664f59f64f6c75feb1574589fd76892848f5e8c57e58bfadaf0d87fad5b",
+    "reproducibility/data/teachers/i2em_train_results.csv": "f5d1a666ba563d0ab05c79c59c00fbe495dd285dcc4b792c6b409a241f5e219b",
+    "scripts/evaluate_decoupled_physics_heads.py": "2d6e7937ba8d7c0c89e4632bd8b2084371fa565b85fe06db10b9ff22a2869923",
+    "src/research_pilots/scattering/surrogate/physics_pretraining.py": "4e0f654519c5d2561fe3777eef8d42aa43ff2a8018dfc513f66efbd1aab35b7d"
+  },
+  "frozen_coefficient_predictions_reproduced": true,
+  "risk_comparisons": "d_risk uses archived coefficients [0.1,0.1,0,0,0]; reselected coefficients are retained separately and never replace paper results",
+  "postprocessing_amendment": "Archived coefficients applied to the same already-reconstructed members; no second training run."
+}

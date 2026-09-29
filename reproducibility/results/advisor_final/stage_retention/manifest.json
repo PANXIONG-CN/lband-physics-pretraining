@@ -1,0 +1,62 @@
+{
+  "status": "COMPLETE",
+  "analysis_role": "post-hoc stage-wise response-retention diagnosis",
+  "target_label_use": "metrics only; no target-domain fitting or selection",
+  "historical_weight_artifact_available": false,
+  "pretraining_only_stage": "deterministically reconstructed from frozen simulation tables, the original architecture, epochs, and five source seeds",
+  "source_finetuned_and_risk_stages": "read from frozen prospective predictions",
+  "cohort": {
+    "rows": 138,
+    "fields": 22
+  },
+  "bootstrap": {
+    "unit": "field_id",
+    "paired_across_methods": true,
+    "iterations": 10000,
+    "seed": 27260910
+  },
+  "reconstruction": [
+    {
+      "repeat": 1,
+      "seed": 20260910,
+      "spm_epochs": 200,
+      "i2em_epochs": 100,
+      "source_observation_fitting": false
+    },
+    {
+      "repeat": 2,
+      "seed": 20360910,
+      "spm_epochs": 200,
+      "i2em_epochs": 100,
+      "source_observation_fitting": false
+    },
+    {
+      "repeat": 3,
+      "seed": 20460910,
+      "spm_epochs": 200,
+      "i2em_epochs": 100,
+      "source_observation_fitting": false
+    },
+    {
+      "repeat": 4,
+      "seed": 20560910,
+      "spm_epochs": 200,
+      "i2em_epochs": 100,
+      "source_observation_fitting": false
+    },
+    {
+      "repeat": 5,
+      "seed": 20660910,
+      "spm_epochs": 200,
+      "i2em_epochs": 100,
+      "source_observation_fitting": false
+    }
+  ],
+  "inputs": {
+    "reproducibility\\results\\common_cohort\\predictions.csv": "0d07da4a3c7bc4cbce4c90be24b77f95bf802c82dfc9ebda355ce734c899bd96",
+    "outputs\\scattering\\rough_ground\\advisor_revision_v1\\angle_control\\i2em_evaluation\\paired_predictions.csv": "891d801403715ea9ab70d5666e0bf978b5403090af94875c894ee80abbb88afa",
+    "reproducibility\\data\\teachers\\spm_pretraining.csv": "2c8f6ffd86a6be9358d3838336513060e184f813757278a1ba579a0dfedc3657",
+    "reproducibility\\data\\teachers\\i2em_train_requests.csv": "15d39664f59f64f6c75feb1574589fd76892848f5e8c57e58bfadaf0d87fad5b",
+    "reproducibility\\data\\teachers\\i2em_train_results.csv": "f5d1a666ba563d0ab05c79c59c00fbe495dd285dcc4b792c6b409a241f5e219b"
+  }
+}

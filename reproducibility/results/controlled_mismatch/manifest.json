@@ -1,0 +1,14 @@
+{
+  "status": "COMPLETE",
+  "scope": "controlled diagnostic stress test",
+  "adaptation_unit": "synthetic parameter sample, NOT real field",
+  "test_role": "already available fixed simulation test points",
+  "oracle": "known generating process; not deployable",
+  "repeats": 20,
+  "files": {
+    "i2em_train_requests.csv": "15d39664f59f64f6c75feb1574589fd76892848f5e8c57e58bfadaf0d87fad5b",
+    "i2em_train_results.csv": "f5d1a666ba563d0ab05c79c59c00fbe495dd285dcc4b792c6b409a241f5e219b",
+    "i2em_test_requests.csv": "58b562fbe4b3f9abea5a8f1c91e074966a80ba7c4c494fe37c238ed312671c0d",
+    "i2em_test_results.csv": "1c79216ded34cfd8aa28562aa1f4d03a9bb46a1111bd115bcf0f4058e9a4a4ff"
+  }
+}

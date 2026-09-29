@@ -1,0 +1,353 @@
+[
+  {
+    "fraction": 0.05,
+    "comparison": "original/zero_source_mean minus unified/zero_source_mean",
+    "ci95": [
+      0.0,
+      0.0
+    ],
+    "interpretation": "conditional shared-field bootstrap; not across new campaigns"
+  },
+  {
+    "fraction": 0.05,
+    "comparison": "original/common_offset_source_mean minus unified/common_offset_source_mean",
+    "ci95": [
+      0.0,
+      0.0
+    ],
+    "interpretation": "conditional shared-field bootstrap; not across new campaigns"
+  },
+  {
+    "fraction": 0.05,
+    "comparison": "original/common_offset_source_ridge minus unified/common_offset_source_ridge",
+    "ci95": [
+      0.0040608706266730635,
+      0.009754472303783146
+    ],
+    "interpretation": "conditional shared-field bootstrap; not across new campaigns"
+  },
+  {
+    "fraction": 0.05,
+    "comparison": "original/scratch minus unified/scratch",
+    "ci95": [
+      0.0018082944660178456,
+      0.0032641461065354483
+    ],
+    "interpretation": "conditional shared-field bootstrap; not across new campaigns"
+  },
+  {
+    "fraction": 0.05,
+    "comparison": "original/spm_only minus unified/spm_only",
+    "ci95": [
+      0.0011911223451718913,
+      0.013448565813036639
+    ],
+    "interpretation": "conditional shared-field bootstrap; not across new campaigns"
+  },
+  {
+    "fraction": 0.05,
+    "comparison": "original/i2em_only minus unified/i2em_only",
+    "ci95": [
+      -0.005828617601822938,
+      3.216465494522148e-05
+    ],
+    "interpretation": "conditional shared-field bootstrap; not across new campaigns"
+  },
+  {
+    "fraction": 0.05,
+    "comparison": "original/spm_to_i2em minus unified/spm_to_i2em",
+    "ci95": [
+      0.0031064076135359333,
+      0.01277542678774566
+    ],
+    "interpretation": "conditional shared-field bootstrap; not across new campaigns"
+  },
+  {
+    "fraction": 0.05,
+    "comparison": "original/risk_spm_to_i2em minus unified/risk_spm_to_i2em",
+    "ci95": [
+      0.0036564482607482685,
+      0.0063389536841528035
+    ],
+    "interpretation": "conditional shared-field bootstrap; not across new campaigns"
+  },
+  {
+    "fraction": 0.05,
+    "comparison": "original/two_channel_means minus unified/two_channel_means",
+    "ci95": [
+      0.0,
+      0.0
+    ],
+    "interpretation": "conditional shared-field bootstrap; not across new campaigns"
+  },
+  {
+    "fraction": 0.05,
+    "comparison": "unified/spm_to_i2em minus unified/spm_only",
+    "ci95": [
+      0.005398301348100154,
+      0.010799076566408128
+    ],
+    "interpretation": "conditional shared-field bootstrap; not across new campaigns"
+  },
+  {
+    "fraction": 0.05,
+    "comparison": "unified/spm_to_i2em minus unified/two_channel_means",
+    "ci95": [
+      -0.011387425225050828,
+      0.04007557523682464
+    ],
+    "interpretation": "conditional shared-field bootstrap; not across new campaigns"
+  },
+  {
+    "fraction": 0.05,
+    "comparison": "original/spm_to_i2em minus original/spm_only",
+    "ci95": [
+      0.006445532719038338,
+      0.011737887489871635
+    ],
+    "interpretation": "conditional shared-field bootstrap; not across new campaigns"
+  },
+  {
+    "fraction": 0.05,
+    "comparison": "original/spm_to_i2em minus original/two_channel_means",
+    "ci95": [
+      -0.007353917773011953,
+      0.052693086118987334
+    ],
+    "interpretation": "conditional shared-field bootstrap; not across new campaigns"
+  },
+  {
+    "fraction": 0.1,
+    "comparison": "original/zero_source_mean minus unified/zero_source_mean",
+    "ci95": [
+      0.0,
+      0.0
+    ],
+    "interpretation": "conditional shared-field bootstrap; not across new campaigns"
+  },
+  {
+    "fraction": 0.1,
+    "comparison": "original/common_offset_source_mean minus unified/common_offset_source_mean",
+    "ci95": [
+      0.0,
+      0.0
+    ],
+    "interpretation": "conditional shared-field bootstrap; not across new campaigns"
+  },
+  {
+    "fraction": 0.1,
+    "comparison": "original/common_offset_source_ridge minus unified/common_offset_source_ridge",
+    "ci95": [
+      0.0033368181417643417,
+      0.008929048678008056
+    ],
+    "interpretation": "conditional shared-field bootstrap; not across new campaigns"
+  },
+  {
+    "fraction": 0.1,
+    "comparison": "original/scratch minus unified/scratch",
+    "ci95": [
+      0.0018985466546370012,
+      0.0034704574455796337
+    ],
+    "interpretation": "conditional shared-field bootstrap; not across new campaigns"
+  },
+  {
+    "fraction": 0.1,
+    "comparison": "original/spm_only minus unified/spm_only",
+    "ci95": [
+      0.0031769514310982187,
+      0.01660315632923735
+    ],
+    "interpretation": "conditional shared-field bootstrap; not across new campaigns"
+  },
+  {
+    "fraction": 0.1,
+    "comparison": "original/i2em_only minus unified/i2em_only",
+    "ci95": [
+      -0.0034842724768994636,
+      0.000513046291622632
+    ],
+    "interpretation": "conditional shared-field bootstrap; not across new campaigns"
+  },
+  {
+    "fraction": 0.1,
+    "comparison": "original/spm_to_i2em minus unified/spm_to_i2em",
+    "ci95": [
+      0.002207098014064357,
+      0.010384887763053664
+    ],
+    "interpretation": "conditional shared-field bootstrap; not across new campaigns"
+  },
+  {
+    "fraction": 0.1,
+    "comparison": "original/risk_spm_to_i2em minus unified/risk_spm_to_i2em",
+    "ci95": [
+      0.004008592023448321,
+      0.006731064795150776
+    ],
+    "interpretation": "conditional shared-field bootstrap; not across new campaigns"
+  },
+  {
+    "fraction": 0.1,
+    "comparison": "original/two_channel_means minus unified/two_channel_means",
+    "ci95": [
+      0.0,
+      0.0
+    ],
+    "interpretation": "conditional shared-field bootstrap; not across new campaigns"
+  },
+  {
+    "fraction": 0.1,
+    "comparison": "unified/spm_to_i2em minus unified/spm_only",
+    "ci95": [
+      0.004434705672689887,
+      0.011174982375199139
+    ],
+    "interpretation": "conditional shared-field bootstrap; not across new campaigns"
+  },
+  {
+    "fraction": 0.1,
+    "comparison": "unified/spm_to_i2em minus unified/two_channel_means",
+    "ci95": [
+      -0.008317894051047058,
+      0.023200745253901145
+    ],
+    "interpretation": "conditional shared-field bootstrap; not across new campaigns"
+  },
+  {
+    "fraction": 0.1,
+    "comparison": "original/spm_to_i2em minus original/spm_only",
+    "ci95": [
+      0.0018685508825886821,
+      0.00736974739505829
+    ],
+    "interpretation": "conditional shared-field bootstrap; not across new campaigns"
+  },
+  {
+    "fraction": 0.1,
+    "comparison": "original/spm_to_i2em minus original/two_channel_means",
+    "ci95": [
+      -0.005371557946727235,
+      0.03319064083335868
+    ],
+    "interpretation": "conditional shared-field bootstrap; not across new campaigns"
+  },
+  {
+    "fraction": 0.2,
+    "comparison": "original/zero_source_mean minus unified/zero_source_mean",
+    "ci95": [
+      0.0,
+      0.0
+    ],
+    "interpretation": "conditional shared-field bootstrap; not across new campaigns"
+  },
+  {
+    "fraction": 0.2,
+    "comparison": "original/common_offset_source_mean minus unified/common_offset_source_mean",
+    "ci95": [
+      0.0,
+      0.0
+    ],
+    "interpretation": "conditional shared-field bootstrap; not across new campaigns"
+  },
+  {
+    "fraction": 0.2,
+    "comparison": "original/common_offset_source_ridge minus unified/common_offset_source_ridge",
+    "ci95": [
+      0.003403720137928601,
+      0.009095463086223155
+    ],
+    "interpretation": "conditional shared-field bootstrap; not across new campaigns"
+  },
+  {
+    "fraction": 0.2,
+    "comparison": "original/scratch minus unified/scratch",
+    "ci95": [
+      0.0015743151113468245,
+      0.002969915527678779
+    ],
+    "interpretation": "conditional shared-field bootstrap; not across new campaigns"
+  },
+  {
+    "fraction": 0.2,
+    "comparison": "original/spm_only minus unified/spm_only",
+    "ci95": [
+      -0.0024366734812674372,
+      0.002399524952307242
+    ],
+    "interpretation": "conditional shared-field bootstrap; not across new campaigns"
+  },
+  {
+    "fraction": 0.2,
+    "comparison": "original/i2em_only minus unified/i2em_only",
+    "ci95": [
+      -0.0002351469663941507,
+      0.0018510889756928827
+    ],
+    "interpretation": "conditional shared-field bootstrap; not across new campaigns"
+  },
+  {
+    "fraction": 0.2,
+    "comparison": "original/spm_to_i2em minus unified/spm_to_i2em",
+    "ci95": [
+      -0.0017673917196492361,
+      0.0025345390017718185
+    ],
+    "interpretation": "conditional shared-field bootstrap; not across new campaigns"
+  },
+  {
+    "fraction": 0.2,
+    "comparison": "original/risk_spm_to_i2em minus unified/risk_spm_to_i2em",
+    "ci95": [
+      0.00462342092466903,
+      0.007876064475933609
+    ],
+    "interpretation": "conditional shared-field bootstrap; not across new campaigns"
+  },
+  {
+    "fraction": 0.2,
+    "comparison": "original/two_channel_means minus unified/two_channel_means",
+    "ci95": [
+      0.0,
+      0.0
+    ],
+    "interpretation": "conditional shared-field bootstrap; not across new campaigns"
+  },
+  {
+    "fraction": 0.2,
+    "comparison": "unified/spm_to_i2em minus unified/spm_only",
+    "ci95": [
+      -0.0015516111183873638,
+      0.003186093463654906
+    ],
+    "interpretation": "conditional shared-field bootstrap; not across new campaigns"
+  },
+  {
+    "fraction": 0.2,
+    "comparison": "unified/spm_to_i2em minus unified/two_channel_means",
+    "ci95": [
+      -0.008063568600124426,
+      0.005953827581139081
+    ],
+    "interpretation": "conditional shared-field bootstrap; not across new campaigns"
+  },
+  {
+    "fraction": 0.2,
+    "comparison": "original/spm_to_i2em minus original/spm_only",
+    "ci95": [
+      -0.0017785335511468659,
+      0.004143737045288698
+    ],
+    "interpretation": "conditional shared-field bootstrap; not across new campaigns"
+  },
+  {
+    "fraction": 0.2,
+    "comparison": "original/spm_to_i2em minus original/two_channel_means",
+    "ci95": [
+      -0.009427479390928428,
+      0.008167519868853657
+    ],
+    "interpretation": "conditional shared-field bootstrap; not across new campaigns"
+  }
+]

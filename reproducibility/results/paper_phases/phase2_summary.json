@@ -1,0 +1,63 @@
+{
+  "phase": "phase2_simulation_sample_efficiency",
+  "repeats": 10,
+  "i2em_training_budgets": [
+    32,
+    64,
+    128,
+    256
+  ],
+  "independent_i2em_test_samples": 128,
+  "budget_definition": "All compared methods use the same number of I2EM labels.",
+  "compute_note": "Residual methods additionally require one SPM evaluation for each query.",
+  "results_by_budget": {
+    "32": {
+      "i2em_only_rmse_db": 0.5385124387953691,
+      "sequential_rmse_db": 0.0741498370196772,
+      "residual_ridge_rmse_db": 0.0548123008694766,
+      "residual_rbf_rmse_db": 0.0129973530329363,
+      "sequential_reduction_vs_i2em_only_percent": 86.23061759064518,
+      "residual_rbf_reduction_vs_sequential_percent": 82.47150154964308
+    },
+    "64": {
+      "i2em_only_rmse_db": 0.4286970117014642,
+      "sequential_rmse_db": 0.0592819491688785,
+      "residual_ridge_rmse_db": 0.0524070356965037,
+      "residual_rbf_rmse_db": 0.0066607885278408,
+      "sequential_reduction_vs_i2em_only_percent": 86.171597293484,
+      "residual_rbf_reduction_vs_sequential_percent": 88.76422145151471
+    },
+    "128": {
+      "i2em_only_rmse_db": 0.3739560207703755,
+      "sequential_rmse_db": 0.0482747586312718,
+      "residual_ridge_rmse_db": 0.0512727723593776,
+      "residual_rbf_rmse_db": 0.003718669018941,
+      "sequential_reduction_vs_i2em_only_percent": 87.09079251302802,
+      "residual_rbf_reduction_vs_sequential_percent": 92.29686667654907
+    },
+    "256": {
+      "i2em_only_rmse_db": 0.2624946189632793,
+      "sequential_rmse_db": 0.0465623912279368,
+      "residual_ridge_rmse_db": 0.0504754249185455,
+      "residual_rbf_rmse_db": 0.0016942485240115,
+      "sequential_reduction_vs_i2em_only_percent": 82.26158257573634,
+      "residual_rbf_reduction_vs_sequential_percent": 96.36133695170928
+    }
+  },
+  "figure_pdf": "PROJECT_ROOT/paper\\figures\\tgrs_v3\\main\\Fig_phase2_sample_efficiency.pdf",
+  "figure_png": "PROJECT_ROOT/paper\\figures\\tgrs_v3\\main\\Fig_phase2_sample_efficiency.png",
+  "sources": {
+    "residual_path": {
+      "path": "PROJECT_ROOT/outputs\\scattering\\rough_ground\\residual_baselines_v1\\summary.csv",
+      "sha256": "28ef25042dc0bca0969dc257d90f3851c663db65fac11e1f0efb62e5fe0a9f74"
+    },
+    "residual_manifest_path": {
+      "path": "PROJECT_ROOT/outputs\\scattering\\rough_ground\\residual_baselines_v1\\manifest.json",
+      "sha256": "6abd44acce851af8aab8f8c617e32692c9c2bdfcdb94430f4d6eae9b219d42d3"
+    },
+    "sample_summary_path": {
+      "path": "PROJECT_ROOT/outputs\\scattering\\rough_ground\\multifidelity_sample_efficiency_20260910_v1\\summary.json",
+      "sha256": "5b3a0b8ebd9f287b851a36bd858e390efa2717d058adb465b162d2a1c791e5cc"
+    }
+  }
+}

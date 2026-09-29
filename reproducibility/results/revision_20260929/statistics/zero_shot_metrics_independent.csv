@@ -1,0 +1,9 @@
+method,mean_hh_vv_rmse_db
+source_mean,4.981190005081649
+source_ridge,5.010089861745415
+scratch,5.155545662167144
+spm_only,5.012603484011838
+i2em_only,5.00645556171835
+spm_to_i2em,5.004098204335279
+risk_spm_to_i2em,4.981328058772875
+ridge_common_risk_spm_to_i2em,5.0233557001398195

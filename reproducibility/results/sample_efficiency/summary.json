@@ -1,0 +1,64 @@
+{
+  "research_question": "How many expensive I2EM samples are required, and does dense SPM pretraining improve high-fidelity sample efficiency?",
+  "sample_sizes": [
+    32,
+    64,
+    128,
+    256
+  ],
+  "repeats": 10,
+  "nested_subset_design": true,
+  "independent_i2em_test_samples": 128,
+  "ranking": [
+    {
+      "i2em_train_samples": 32,
+      "method": "i2em_only",
+      "mean_hh_vv_rmse_db": 0.5385124387953691,
+      "std_hh_vv_rmse_db": 0.06627304348649664
+    },
+    {
+      "i2em_train_samples": 32,
+      "method": "spm_to_i2em",
+      "mean_hh_vv_rmse_db": 0.07414983701967728,
+      "std_hh_vv_rmse_db": 0.014563939809831427
+    },
+    {
+      "i2em_train_samples": 64,
+      "method": "i2em_only",
+      "mean_hh_vv_rmse_db": 0.42869701170146424,
+      "std_hh_vv_rmse_db": 0.07548679825735682
+    },
+    {
+      "i2em_train_samples": 64,
+      "method": "spm_to_i2em",
+      "mean_hh_vv_rmse_db": 0.05928194916887856,
+      "std_hh_vv_rmse_db": 0.010738831918904675
+    },
+    {
+      "i2em_train_samples": 128,
+      "method": "i2em_only",
+      "mean_hh_vv_rmse_db": 0.3739560207703755,
+      "std_hh_vv_rmse_db": 0.04281939813108081
+    },
+    {
+      "i2em_train_samples": 128,
+      "method": "spm_to_i2em",
+      "mean_hh_vv_rmse_db": 0.04827475863127187,
+      "std_hh_vv_rmse_db": 0.00534814143258556
+    },
+    {
+      "i2em_train_samples": 256,
+      "method": "i2em_only",
+      "mean_hh_vv_rmse_db": 0.2624946189632793,
+      "std_hh_vv_rmse_db": 0.035232602777988876
+    },
+    {
+      "i2em_train_samples": 256,
+      "method": "spm_to_i2em",
+      "mean_hh_vv_rmse_db": 0.04656239122793688,
+      "std_hh_vv_rmse_db": 0.005069219971623603
+    }
+  ],
+  "decision_rule": "Sample efficiency is supported when SPM-to-I2EM has lower independent-test RMSE than I2EM-only across repeats, especially at 32-128 samples, without selecting a size using the test set.",
+  "scope_limit": "This sensitivity concerns approximation of the I2EM teacher, not field-observation accuracy."
+}

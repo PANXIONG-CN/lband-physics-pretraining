@@ -1,0 +1,20 @@
+{
+  "status": "COMPLETE",
+  "scientific_role": "Post-processing comparison on the shared 138-row SMEX02 validity cohort",
+  "training_performed": false,
+  "model_selection_performed": false,
+  "join_keys": [
+    "field_id",
+    "acquisition_date"
+  ],
+  "rows": 138,
+  "fields": 22,
+  "physics_input": {
+    "path": "PROJECT_ROOT/outputs\\scattering\\rough_ground\\advisor_revision_v1\\angle_control\\i2em_evaluation\\paired_predictions.csv",
+    "sha256": "891d801403715ea9ab70d5666e0bf978b5403090af94875c894ee80abbb88afa"
+  },
+  "network_input": {
+    "path": "PROJECT_ROOT/outputs\\scattering\\rough_ground\\smex02_prospective_zero_shot_20260911_v1\\zero_shot_predictions.csv",
+    "sha256": "fd98169eec48f2e5faf8eaf59af029c18d0d0ec0eba56dfd84471fe51f0c8a69"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "status": "FROZEN_RECALCULATION_COMPLETE",
+  "files_verified": 146,
+  "source_code_files": [],
+  "common_comparison": [
+    {
+      "requested_fraction": 0.05,
+      "i2em_actual_angle_plus_offset": 4.8917416307752815,
+      "risk_spm_to_i2em": 4.308357258199983,
+      "spm_actual_angle_plus_offset": 4.885910124959039,
+      "spm_only": 4.228795066407379,
+      "spm_to_i2em": 4.2394414859960285,
+      "two_channel_mean": 4.3478244338466245,
+      "two_channel_mean_full_adapt": 4.2255942797135955
+    },
+    {
+      "requested_fraction": 0.1,
+      "i2em_actual_angle_plus_offset": 4.754708504642558,
+      "risk_spm_to_i2em": 4.276131180187375,
+      "spm_actual_angle_plus_offset": 4.749474106598329,
+      "spm_only": 4.16728265269482,
+      "spm_to_i2em": 4.17695920312158,
+      "two_channel_mean": 4.29306776897149,
+      "two_channel_mean_full_adapt": 4.1700273016132545
+    },
+    {
+      "requested_fraction": 0.2,
+      "i2em_actual_angle_plus_offset": 4.212662825840894,
+      "risk_spm_to_i2em": 4.243904678382782,
+      "spm_actual_angle_plus_offset": 4.213678459668351,
+      "spm_only": 4.120389927568153,
+      "spm_to_i2em": 4.121214274337676,
+      "two_channel_mean": 4.13765089058767,
+      "two_channel_mean_full_adapt": 4.125712026049224
+    }
+  ]
+}

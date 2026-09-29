@@ -1,0 +1,314 @@
+{
+  "status": "PREREGISTERED_FEW_SHOT_COMPLETE",
+  "research_question": "Can a small number of complete SMEX02 fields calibrate campaign shift while preserving the frozen physics-transfer rule?",
+  "protocol": {
+    "adaptation_unit": "whole field_id",
+    "split_repeats": 20,
+    "model_repeats": 5,
+    "common_adaptation": "one additive offset estimated from adaptation fields only",
+    "differential_adaptation": "30-epoch fine-tuning of locked source differential heads; risk shrinkage remains source-only",
+    "test_unit": "all rows from untouched fields",
+    "uncertainty": "hierarchical bootstrap over split repeats and held-out field blocks"
+  },
+  "adaptation_plan": [
+    {
+      "requested_fraction": 0.05,
+      "adaptation_fields": 2,
+      "actual_fraction": 0.06666666666666667,
+      "test_fields": 28
+    },
+    {
+      "requested_fraction": 0.1,
+      "adaptation_fields": 3,
+      "actual_fraction": 0.1,
+      "test_fields": 27
+    },
+    {
+      "requested_fraction": 0.2,
+      "adaptation_fields": 6,
+      "actual_fraction": 0.2,
+      "test_fields": 24
+    }
+  ],
+  "mean_hh_vv_rmse_db": [
+    {
+      "requested_fraction": 0.05,
+      "actual_fraction": 0.06666666666666667,
+      "method": "spm_only",
+      "rmse_db": 4.175475836762626
+    },
+    {
+      "requested_fraction": 0.05,
+      "actual_fraction": 0.06666666666666667,
+      "method": "i2em_only",
+      "rmse_db": 4.177835720354915
+    },
+    {
+      "requested_fraction": 0.05,
+      "actual_fraction": 0.06666666666666667,
+      "method": "spm_to_i2em",
+      "rmse_db": 4.183423316827663
+    },
+    {
+      "requested_fraction": 0.05,
+      "actual_fraction": 0.06666666666666667,
+      "method": "risk_spm_to_i2em",
+      "rmse_db": 4.293509962292324
+    },
+    {
+      "requested_fraction": 0.05,
+      "actual_fraction": 0.06666666666666667,
+      "method": "common_offset_source_mean",
+      "rmse_db": 4.303347559590872
+    },
+    {
+      "requested_fraction": 0.05,
+      "actual_fraction": 0.06666666666666667,
+      "method": "scratch",
+      "rmse_db": 4.478686869656867
+    },
+    {
+      "requested_fraction": 0.05,
+      "actual_fraction": 0.06666666666666667,
+      "method": "common_offset_source_ridge",
+      "rmse_db": 4.570652611369453
+    },
+    {
+      "requested_fraction": 0.05,
+      "actual_fraction": 0.06666666666666667,
+      "method": "zero_source_mean",
+      "rmse_db": 4.987254743358687
+    },
+    {
+      "requested_fraction": 0.1,
+      "actual_fraction": 0.1,
+      "method": "spm_only",
+      "rmse_db": 4.10018652407809
+    },
+    {
+      "requested_fraction": 0.1,
+      "actual_fraction": 0.1,
+      "method": "i2em_only",
+      "rmse_db": 4.104980734375182
+    },
+    {
+      "requested_fraction": 0.1,
+      "actual_fraction": 0.1,
+      "method": "spm_to_i2em",
+      "rmse_db": 4.107805270270653
+    },
+    {
+      "requested_fraction": 0.1,
+      "actual_fraction": 0.1,
+      "method": "risk_spm_to_i2em",
+      "rmse_db": 4.2405685027101425
+    },
+    {
+      "requested_fraction": 0.1,
+      "actual_fraction": 0.1,
+      "method": "common_offset_source_mean",
+      "rmse_db": 4.251253899005988
+    },
+    {
+      "requested_fraction": 0.1,
+      "actual_fraction": 0.1,
+      "method": "scratch",
+      "rmse_db": 4.433786453184807
+    },
+    {
+      "requested_fraction": 0.1,
+      "actual_fraction": 0.1,
+      "method": "common_offset_source_ridge",
+      "rmse_db": 4.4588585528647755
+    },
+    {
+      "requested_fraction": 0.1,
+      "actual_fraction": 0.1,
+      "method": "zero_source_mean",
+      "rmse_db": 4.980662441509896
+    },
+    {
+      "requested_fraction": 0.2,
+      "actual_fraction": 0.2,
+      "method": "spm_only",
+      "rmse_db": 4.0578562192662435
+    },
+    {
+      "requested_fraction": 0.2,
+      "actual_fraction": 0.2,
+      "method": "spm_to_i2em",
+      "rmse_db": 4.058616531648905
+    },
+    {
+      "requested_fraction": 0.2,
+      "actual_fraction": 0.2,
+      "method": "i2em_only",
+      "rmse_db": 4.059401465204308
+    },
+    {
+      "requested_fraction": 0.2,
+      "actual_fraction": 0.2,
+      "method": "risk_spm_to_i2em",
+      "rmse_db": 4.210241524641344
+    },
+    {
+      "requested_fraction": 0.2,
+      "actual_fraction": 0.2,
+      "method": "common_offset_source_mean",
+      "rmse_db": 4.222665052121867
+    },
+    {
+      "requested_fraction": 0.2,
+      "actual_fraction": 0.2,
+      "method": "scratch",
+      "rmse_db": 4.4063065468821
+    },
+    {
+      "requested_fraction": 0.2,
+      "actual_fraction": 0.2,
+      "method": "common_offset_source_ridge",
+      "rmse_db": 4.42754970802396
+    },
+    {
+      "requested_fraction": 0.2,
+      "actual_fraction": 0.2,
+      "method": "zero_source_mean",
+      "rmse_db": 4.980038860465909
+    }
+  ],
+  "paired_hierarchical_bootstrap": {
+    "requested_0.05_actual_0.066667": {
+      "risk_minus_zero_source_mean": {
+        "mean_split_rmse_delta_db": -0.6937447810663622,
+        "ci_2_5_percent_db": -0.7838239499119731,
+        "ci_97_5_percent_db": -0.6001174227268778,
+        "probability_first_better": 1.0
+      },
+      "risk_minus_common_offset_source_mean": {
+        "mean_split_rmse_delta_db": -0.009837597298546986,
+        "ci_2_5_percent_db": -0.011979392392510916,
+        "ci_97_5_percent_db": -0.0075597655258953485,
+        "probability_first_better": 1.0
+      },
+      "risk_minus_common_offset_source_ridge": {
+        "mean_split_rmse_delta_db": -0.27714264907712816,
+        "ci_2_5_percent_db": -0.35607601310293135,
+        "ci_97_5_percent_db": -0.2052653238390926,
+        "probability_first_better": 1.0
+      },
+      "risk_minus_scratch": {
+        "mean_split_rmse_delta_db": -0.18517690736454234,
+        "ci_2_5_percent_db": -0.196273273298372,
+        "ci_97_5_percent_db": -0.17272384213207378,
+        "probability_first_better": 1.0
+      },
+      "risk_minus_spm_only": {
+        "mean_split_rmse_delta_db": 0.11803412552969887,
+        "ci_2_5_percent_db": 0.08780183884636791,
+        "ci_97_5_percent_db": 0.1436869694916424,
+        "probability_first_better": 0.0
+      },
+      "risk_minus_i2em_only": {
+        "mean_split_rmse_delta_db": 0.11567424193740927,
+        "ci_2_5_percent_db": 0.08477813387567167,
+        "ci_97_5_percent_db": 0.14235368522856282,
+        "probability_first_better": 0.0
+      },
+      "risk_minus_spm_to_i2em": {
+        "mean_split_rmse_delta_db": 0.11008664546466149,
+        "ci_2_5_percent_db": 0.07729542748012666,
+        "ci_97_5_percent_db": 0.13969087508691205,
+        "probability_first_better": 0.0
+      }
+    },
+    "requested_0.10_actual_0.100000": {
+      "risk_minus_zero_source_mean": {
+        "mean_split_rmse_delta_db": -0.740093938799753,
+        "ci_2_5_percent_db": -0.8249246607863521,
+        "ci_97_5_percent_db": -0.6463780949736654,
+        "probability_first_better": 1.0
+      },
+      "risk_minus_common_offset_source_mean": {
+        "mean_split_rmse_delta_db": -0.010685396295845662,
+        "ci_2_5_percent_db": -0.012157709047857937,
+        "ci_97_5_percent_db": -0.009013100475536674,
+        "probability_first_better": 1.0
+      },
+      "risk_minus_common_offset_source_ridge": {
+        "mean_split_rmse_delta_db": -0.21829005015463268,
+        "ci_2_5_percent_db": -0.26919273076145095,
+        "ci_97_5_percent_db": -0.16579971168666624,
+        "probability_first_better": 1.0
+      },
+      "risk_minus_scratch": {
+        "mean_split_rmse_delta_db": -0.19321795047466422,
+        "ci_2_5_percent_db": -0.20435077546885516,
+        "ci_97_5_percent_db": -0.18016378053743642,
+        "probability_first_better": 1.0
+      },
+      "risk_minus_spm_only": {
+        "mean_split_rmse_delta_db": 0.14038197863205285,
+        "ci_2_5_percent_db": 0.1198826784842285,
+        "ci_97_5_percent_db": 0.1612362376764123,
+        "probability_first_better": 0.0
+      },
+      "risk_minus_i2em_only": {
+        "mean_split_rmse_delta_db": 0.1355877683349598,
+        "ci_2_5_percent_db": 0.11471111268440573,
+        "ci_97_5_percent_db": 0.15460064831519313,
+        "probability_first_better": 0.0
+      },
+      "risk_minus_spm_to_i2em": {
+        "mean_split_rmse_delta_db": 0.1327632324394897,
+        "ci_2_5_percent_db": 0.10532026983866162,
+        "ci_97_5_percent_db": 0.1572485252491922,
+        "probability_first_better": 0.0
+      }
+    },
+    "requested_0.20_actual_0.200000": {
+      "risk_minus_zero_source_mean": {
+        "mean_split_rmse_delta_db": -0.7697973358245644,
+        "ci_2_5_percent_db": -0.8524213877203111,
+        "ci_97_5_percent_db": -0.6804723172277081,
+        "probability_first_better": 1.0
+      },
+      "risk_minus_common_offset_source_mean": {
+        "mean_split_rmse_delta_db": -0.012423527480522579,
+        "ci_2_5_percent_db": -0.013579007320817127,
+        "ci_97_5_percent_db": -0.01115627380489028,
+        "probability_first_better": 1.0
+      },
+      "risk_minus_common_offset_source_ridge": {
+        "mean_split_rmse_delta_db": -0.21730818338261657,
+        "ci_2_5_percent_db": -0.25432642611563155,
+        "ci_97_5_percent_db": -0.18122552241413162,
+        "probability_first_better": 1.0
+      },
+      "risk_minus_scratch": {
+        "mean_split_rmse_delta_db": -0.19606502224075642,
+        "ci_2_5_percent_db": -0.2061960806030873,
+        "ci_97_5_percent_db": -0.18348215314114885,
+        "probability_first_better": 1.0
+      },
+      "risk_minus_spm_only": {
+        "mean_split_rmse_delta_db": 0.15238530537510014,
+        "ci_2_5_percent_db": 0.1323165885207675,
+        "ci_97_5_percent_db": 0.17180087346548506,
+        "probability_first_better": 0.0
+      },
+      "risk_minus_i2em_only": {
+        "mean_split_rmse_delta_db": 0.1508400594370352,
+        "ci_2_5_percent_db": 0.13289194672518417,
+        "ci_97_5_percent_db": 0.16742024894266638,
+        "probability_first_better": 0.0
+      },
+      "risk_minus_spm_to_i2em": {
+        "mean_split_rmse_delta_db": 0.15162499299243828,
+        "ci_2_5_percent_db": 0.13059060243940088,
+        "ci_97_5_percent_db": 0.17138863382653477,
+        "probability_first_better": 0.0
+      }
+    }
+  },
+  "guardrail": "This stage estimates adaptation performance only. It does not retroactively change the completed zero-shot verdict."
+}

@@ -1,0 +1,107 @@
+{
+  "status": "PHASE3_CROSS_DOMAIN_EVIDENCE_COMPLETE",
+  "training_performed_by_this_script": false,
+  "model_selection_performed_by_this_script": false,
+  "zero_shot": {
+    "source_mean_rmse_db": 4.981190005081649,
+    "risk_controlled_rmse_db": 4.981328058772874,
+    "risk_minus_source_mean_db": 0.0001380536912254371,
+    "field_bootstrap_95_ci_db": [
+      -0.0014225564896903186,
+      0.0019588672177254696
+    ],
+    "claim_verdict": "NOT_SUPPORTED"
+  },
+  "few_shot": [
+    {
+      "adaptation_fields": 2,
+      "actual_fraction": 0.06666666666666667,
+      "scratch_rmse_db": 4.478686869656867,
+      "spm_only_rmse_db": 4.175475836762626,
+      "spm_to_i2em_rmse_db": 4.183423316827662,
+      "two_channel_mean_rmse_db": 4.170679774994317,
+      "spm_minus_two_channel_mean_db": 0.0047960617683084905,
+      "spm_minus_two_channel_mean_interval_db": [
+        -0.018295867619197215,
+        0.028917922754700523
+      ]
+    },
+    {
+      "adaptation_fields": 3,
+      "actual_fraction": 0.1,
+      "scratch_rmse_db": 4.4337864531848075,
+      "spm_only_rmse_db": 4.100186524078089,
+      "spm_to_i2em_rmse_db": 4.107805270270654,
+      "two_channel_mean_rmse_db": 4.101154960636103,
+      "spm_minus_two_channel_mean_db": -0.0009684365580140408,
+      "spm_minus_two_channel_mean_interval_db": [
+        -0.014217756493942435,
+        0.01257446859584028
+      ]
+    },
+    {
+      "adaptation_fields": 6,
+      "actual_fraction": 0.2,
+      "scratch_rmse_db": 4.406306546882101,
+      "spm_only_rmse_db": 4.0578562192662435,
+      "spm_to_i2em_rmse_db": 4.058616531648906,
+      "two_channel_mean_rmse_db": 4.059592175911961,
+      "spm_minus_two_channel_mean_db": -0.0017359566457173514,
+      "spm_minus_two_channel_mean_interval_db": [
+        -0.01034149400143829,
+        0.0064050858777451565
+      ]
+    }
+  ],
+  "centered_response": [
+    {
+      "adaptation_fields": 2,
+      "actual_fraction": 0.06666666666666667,
+      "spm_centered_skill": -0.1378809134080648,
+      "sequential_centered_skill": -0.1768522109561676,
+      "spm_variance_ratio": 0.0766402430962709,
+      "sequential_variance_ratio": 0.1038455381668115
+    },
+    {
+      "adaptation_fields": 3,
+      "actual_fraction": 0.1,
+      "spm_centered_skill": -0.0818223176893088,
+      "sequential_centered_skill": -0.1223710717784112,
+      "spm_variance_ratio": 0.0347046630180846,
+      "sequential_variance_ratio": 0.0692103134854591
+    },
+    {
+      "adaptation_fields": 6,
+      "actual_fraction": 0.2,
+      "spm_centered_skill": -0.0405824101451239,
+      "sequential_centered_skill": -0.0500810394319696,
+      "spm_variance_ratio": 0.012672135902166,
+      "sequential_variance_ratio": 0.015034780240479
+    }
+  ],
+  "shared_138_row_cohort": {
+    "I2EM": {
+      "centered_skill": 0.1765704995159382,
+      "variance_ratio": 0.0745417380177911
+    },
+    "SPM": {
+      "centered_skill": 0.1702586193702743,
+      "variance_ratio": 0.0902349721166811
+    },
+    "SPM to I2EM": {
+      "centered_skill": -0.4710343252980129,
+      "variance_ratio": 0.1709816839672567
+    },
+    "Risk-controlled transfer": {
+      "centered_skill": -0.0115259128692619,
+      "variance_ratio": 0.0002654486975484
+    }
+  },
+  "input_sha256": {
+    "PROJECT_ROOT/outputs\\scattering\\rough_ground\\smex02_prospective_zero_shot_20260911_v1\\summary.json": "d43762bb23afd3c7a1491395923d677a000b5e7ecb8a4b7456280e4bfd3ed0e3",
+    "PROJECT_ROOT/outputs\\scattering\\rough_ground\\smex02_preregistered_few_shot_20260911_v1\\summary.json": "6c3be3af8cf0aa8bb4cf46d2571beb5720a06a21984a152f0d0c3134c0058b31",
+    "PROJECT_ROOT/outputs\\scattering\\rough_ground\\paper_submission_closeout_20260911_v1\\paper_audit_supplement_v1\\summary.json": "9d56757a94bf6e8bd5c2eb9590fdb9203816880650e17acf48c508af350faac6",
+    "PROJECT_ROOT/outputs\\scattering\\rough_ground\\paper_submission_closeout_20260911_v1\\response_learning_v1\\response_summary.csv": "1579baf7ae4ada03374b575219770a16c1ac93faa0a1eb2d864a8b74dedcf194",
+    "PROJECT_ROOT/outputs\\scattering\\rough_ground\\smex02_common_cohort_20260921_v1\\common_cohort_metrics.csv": "a8c31907debe1ab3031058f70eb8a64d3452a39ccb29f1497c59c8cde2478d5a"
+  }
+}

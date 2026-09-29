@@ -1,0 +1,71 @@
+{
+  "phase": "phase1_physics_teacher_evidence",
+  "anchor_validation": {
+    "request_count": 18,
+    "models": [
+      "exponential",
+      "gaussian"
+    ],
+    "mean_i2em_minus_spm_hh_db": 0.5150817215492457,
+    "mean_i2em_minus_spm_vv_db": 0.08906090653913859,
+    "maximum_absolute_difference_hh_db": 6.559814537963376,
+    "maximum_absolute_difference_vv_db": 4.49628485485654,
+    "interpretation": "Differences quantify teacher disagreement, not I2EM error. Agreement in the smooth overlap regime and physically plausible trends are required before pretraining."
+  },
+  "formal_multifidelity_test": {
+    "test_sample_count": 128,
+    "hh": {
+      "sample_count": 128,
+      "mean_absolute_disagreement_db": 0.15560496868689602,
+      "spearman_spm_i2em": 0.998363394982604
+    },
+    "vv": {
+      "sample_count": 128,
+      "mean_absolute_disagreement_db": 0.22432196486828043,
+      "spearman_spm_i2em": 0.9997711041933712
+    },
+    "validity_strata": {
+      "interior_le_0.4": {
+        "n": 101,
+        "mean_absolute_disagreement_db": 0.17434574691704682
+      },
+      "middle_0.4_to_0.7": {
+        "n": 24,
+        "mean_absolute_disagreement_db": 0.24030435538750847
+      },
+      "nearer_boundary_gt_0.7": {
+        "n": 3,
+        "mean_absolute_disagreement_db": 0.3130329265364491
+      }
+    },
+    "loss_tangent_values": [
+      0.0,
+      0.02,
+      0.05,
+      0.1
+    ],
+    "maximum_loss_change_hh_db": 0.0286917796856016,
+    "maximum_loss_change_vv_db": 0.0379561152648015,
+    "figure_pdf": "PROJECT_ROOT/paper\\figures\\tgrs_v3\\main\\Fig_phase1_physics_teacher_evidence.pdf",
+    "figure_png": "PROJECT_ROOT/paper\\figures\\tgrs_v3\\main\\Fig_phase1_physics_teacher_evidence.png"
+  },
+  "interpretation_scope": {
+    "teacher_comparison": "SPM and I2EM are compared as two physics teachers.",
+    "loss_sensitivity": "Loss-tangent results quantify parameter sensitivity.",
+    "model_selection": "This consolidation does not retrain or select a model."
+  },
+  "input_provenance": {
+    "paired_teacher_csv": {
+      "path": "PROJECT_ROOT/outputs\\scattering\\rough_ground\\multifidelity_pretraining_20260910_v1\\evaluation\\paired_teacher_disagreement.csv",
+      "sha256": "4887d830ca5de46f2c9ce7e626c474051254c5617466fbdda1b651e9c6fdb103"
+    },
+    "loss_requests": {
+      "path": "PROJECT_ROOT/outputs\\scattering\\rough_ground\\i2em_loss_sensitivity_20260909_v1\\i2em_loss_sensitivity_requests.csv",
+      "sha256": "09379ef0949fe3bc03538e7374ef3d941203c8b941dc7bfda3bb4e0585c5b820"
+    },
+    "loss_results": {
+      "path": "PROJECT_ROOT/outputs\\scattering\\rough_ground\\i2em_loss_sensitivity_20260909_v1\\i2em_loss_sensitivity_results.csv",
+      "sha256": "57d6ce503d3a4439d3c15c2a024e3e83ae092dc8881ccb07f26c8caef93275a8"
+    }
+  }
+}

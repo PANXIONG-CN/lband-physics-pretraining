@@ -1,0 +1,45 @@
+ requested_fraction  actual_fraction  valid_splits  usable_adaptation_fields_mean  usable_adaptation_fields_min  usable_adaptation_fields_max  usable_adaptation_rows_mean  usable_adaptation_rows_min  usable_adaptation_rows_max  common_test_rows_mean  all_original_adaptation_rows_mean
+               0.05         0.066667            17                       1.588235                             1                             2                     9.705882                           6                          13             128.294118                          12.235294
+               0.10         0.100000            19                       2.263158                             1                             3                    13.947368                           6                          20             124.052632                          18.526316
+               0.20         0.200000            20                       4.300000                             3                             6                    27.050000                          18                          38             110.950000                          37.800000
+ requested_fraction                          method  mean_channel_rmse_db  conditional_ci_low_db  conditional_ci_high_db  valid_splits
+               0.05                two_channel_mean              4.347824               4.080847                4.582421            17
+               0.05 two_channel_mean_all_adaptation              4.225594               3.954423                4.461049            17
+               0.05   i2em_actual_angle_plus_offset              4.891742               4.421507                5.453331            17
+               0.05    spm_actual_angle_plus_offset              4.885910               4.420619                5.439851            17
+               0.05                        spm_only              4.228795               3.960141                4.464323            17
+               0.05                     spm_to_i2em              4.239441               3.971207                4.474398            17
+               0.05                risk_spm_to_i2em              4.308357               4.051522                4.542869            17
+               0.10                two_channel_mean              4.293068               4.018809                4.539369            19
+               0.10 two_channel_mean_all_adaptation              4.170027               3.893604                4.409885            19
+               0.10   i2em_actual_angle_plus_offset              4.754709               4.296681                5.296321            19
+               0.10    spm_actual_angle_plus_offset              4.749474               4.295767                5.285811            19
+               0.10                        spm_only              4.167283               3.892219                4.407063            19
+               0.10                     spm_to_i2em              4.176959               3.901672                4.417335            19
+               0.10                risk_spm_to_i2em              4.276131               4.014142                4.509354            19
+               0.20                two_channel_mean              4.137651               3.856350                4.384450            20
+               0.20 two_channel_mean_all_adaptation              4.125712               3.847824                4.367412            20
+               0.20   i2em_actual_angle_plus_offset              4.212663               3.739009                4.738497            20
+               0.20    spm_actual_angle_plus_offset              4.213678               3.742032                4.733483            20
+               0.20                        spm_only              4.120390               3.843110                4.360657            20
+               0.20                     spm_to_i2em              4.121214               3.842692                4.362667            20
+               0.20                risk_spm_to_i2em              4.243905               3.982624                4.474520            20
+ requested_fraction                  first_method                   second_method  delta_first_minus_second_db  conditional_ci_low_db  conditional_ci_high_db  probability_first_lower_rmse
+               0.05 i2em_actual_angle_plus_offset                two_channel_mean                     0.543917               0.109223                1.044057                        0.0039
+               0.05                      spm_only two_channel_mean_all_adaptation                     0.003201              -0.023805                0.032319                        0.4289
+               0.05                   spm_to_i2em                        spm_only                     0.010646               0.007313                0.014282                        0.0000
+               0.05              risk_spm_to_i2em two_channel_mean_all_adaptation                     0.082763              -0.020022                0.186443                        0.0547
+               0.05  spm_actual_angle_plus_offset                two_channel_mean                     0.538086               0.111511                1.029284                        0.0035
+               0.05                   spm_to_i2em two_channel_mean_all_adaptation                     0.013847              -0.014854                0.045218                        0.1922
+               0.10 i2em_actual_angle_plus_offset                two_channel_mean                     0.461641               0.044979                0.919811                        0.0120
+               0.10                      spm_only two_channel_mean_all_adaptation                    -0.002745              -0.018097                0.013293                        0.6468
+               0.10                   spm_to_i2em                        spm_only                     0.009677               0.006019                0.013653                        0.0000
+               0.10              risk_spm_to_i2em two_channel_mean_all_adaptation                     0.106104               0.009453                0.202629                        0.0147
+               0.10  spm_actual_angle_plus_offset                two_channel_mean                     0.456406               0.049728                0.907167                        0.0113
+               0.10                   spm_to_i2em two_channel_mean_all_adaptation                     0.006932              -0.010628                0.025613                        0.2407
+               0.20 i2em_actual_angle_plus_offset                two_channel_mean                     0.075012              -0.350725                0.533911                        0.3984
+               0.20                      spm_only two_channel_mean_all_adaptation                    -0.005322              -0.015455                0.004522                        0.8548
+               0.20                   spm_to_i2em                        spm_only                     0.000824              -0.002101                0.003603                        0.2854
+               0.20              risk_spm_to_i2em two_channel_mean_all_adaptation                     0.118193               0.011893                0.225188                        0.0136
+               0.20  spm_actual_angle_plus_offset                two_channel_mean                     0.076028              -0.340414                0.528109                        0.3962
+               0.20                   spm_to_i2em two_channel_mean_all_adaptation                    -0.004498              -0.012092                0.002728                        0.8868

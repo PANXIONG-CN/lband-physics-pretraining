@@ -1,0 +1,120 @@
+{
+  "status": "PROSPECTIVE_ZERO_SHOT_COMPLETE",
+  "claim_verdict": "NOT_SUPPORTED",
+  "research_question": "Does the frozen component-decoupled, risk-controlled multi-fidelity method improve HH/VV backscatter prediction in independent SMEX02?",
+  "protocol": {
+    "source_campaign": "SMAPVEX12",
+    "external_campaign": "SMEX02",
+    "source_only_model_selection": true,
+    "external_target_use": "final scoring and field-block uncertainty only",
+    "common_head_primary": "source-training mean",
+    "differential_head_primary": "SPM-to-I2EM plus source-real fit and source-only grouped-CV shrinkage",
+    "common_ridge_role": "secondary pre-registered ablation",
+    "repeats": 5,
+    "bootstrap_unit": "SMEX02 field_id",
+    "bootstrap_iterations": 4000,
+    "minimum_field_subgroup_rows": 3
+  },
+  "samples": {
+    "source_rows": 240,
+    "source_fields": 24,
+    "external_rows": 189,
+    "external_fields": 30,
+    "external_dates": 7
+  },
+  "source_only_shrinkage_by_repeat": [
+    {
+      "repeat": 1,
+      "seed": 20260910,
+      "selected_weight": 0.1
+    },
+    {
+      "repeat": 2,
+      "seed": 20360910,
+      "selected_weight": 0.1
+    },
+    {
+      "repeat": 3,
+      "seed": 20460910,
+      "selected_weight": 0.0
+    },
+    {
+      "repeat": 4,
+      "seed": 20560910,
+      "selected_weight": 0.0
+    },
+    {
+      "repeat": 5,
+      "seed": 20660910,
+      "selected_weight": 0.0
+    }
+  ],
+  "mean_hh_vv_rmse_ranking_db": {
+    "source_mean": 4.981190005081649,
+    "risk_spm_to_i2em": 4.981328058772874,
+    "spm_to_i2em": 5.004098204335278,
+    "i2em_only": 5.006455561718351,
+    "source_ridge": 5.010089861745415,
+    "spm_only": 5.012603484011837,
+    "ridge_common_risk_spm_to_i2em": 5.0233557001398195,
+    "scratch": 5.155545662167144
+  },
+  "paired_field_bootstrap": {
+    "risk_spm_to_i2em_minus_source_mean": {
+      "mean_channel_rmse_delta_db": 0.0001380536912254371,
+      "ci_2_5_percent_db": -0.0014225564896903186,
+      "ci_97_5_percent_db": 0.0019588672177254696,
+      "probability_first_better": 0.4435
+    },
+    "risk_spm_to_i2em_minus_source_ridge": {
+      "mean_channel_rmse_delta_db": -0.02876180297254116,
+      "ci_2_5_percent_db": -0.16871211942200784,
+      "ci_97_5_percent_db": 0.12178423626356186,
+      "probability_first_better": 0.65575
+    },
+    "risk_spm_to_i2em_minus_scratch": {
+      "mean_channel_rmse_delta_db": -0.17421760339427017,
+      "ci_2_5_percent_db": -0.22998680227348692,
+      "ci_97_5_percent_db": -0.12217504006192445,
+      "probability_first_better": 1.0
+    },
+    "risk_spm_to_i2em_minus_spm_only": {
+      "mean_channel_rmse_delta_db": -0.031275425238963095,
+      "ci_2_5_percent_db": -0.0859182014073708,
+      "ci_97_5_percent_db": 0.013615393412294934,
+      "probability_first_better": 0.9
+    },
+    "risk_spm_to_i2em_minus_i2em_only": {
+      "mean_channel_rmse_delta_db": -0.02512750294547672,
+      "ci_2_5_percent_db": -0.07427923420950147,
+      "ci_97_5_percent_db": 0.015812041861979962,
+      "probability_first_better": 0.8585
+    },
+    "risk_spm_to_i2em_minus_spm_to_i2em": {
+      "mean_channel_rmse_delta_db": -0.02277014556240431,
+      "ci_2_5_percent_db": -0.07171903939010094,
+      "ci_97_5_percent_db": 0.020567961196430454,
+      "probability_first_better": 0.81925
+    }
+  },
+  "primary_comparator": "source_mean",
+  "primary_comparison": {
+    "mean_channel_rmse_delta_db": 0.0001380536912254371,
+    "ci_2_5_percent_db": -0.0014225564896903186,
+    "ci_97_5_percent_db": 0.0019588672177254696,
+    "probability_first_better": 0.4435
+  },
+  "pre_registered_claim_checks": {
+    "improvement_at_least_0_10_db": false,
+    "bootstrap_ci_entirely_below_zero": false,
+    "all_adequate_fields_noninferior_to_source_mean_within_0_10_db": true,
+    "adequate_fields": 30,
+    "fields_failing_noninferiority": []
+  },
+  "interpretation_rule": "A superiority claim is permitted only when all three checks are true; otherwise report a limitation or negative-transfer result.",
+  "inputs": {
+    "source_sha256": "7b52a128dfbdd49c6270bc80203227cb63daa7f7e312a1f40a50c6ecbe15e785",
+    "external_sha256": "e984a1cf6b39a35f28e3087b7f13f22e7aaf0de0a3a4b2e843b7dc00f44fb408",
+    "freeze_manifest_sha256": "e919382879ad7dccdfd7f8313a3dc5760c738339d8d9bbdf3ba8b1b1d0a7434a"
+  }
+}

@@ -1,0 +1,4 @@
+table,rows,inside_reported_sim_box,outside_reported_sim_box,spm_valid,i2em_valid
+source,240,182,58,186,207
+target,189,127,62,138,189
+common,138,127,11,138,138

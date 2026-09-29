@@ -1,0 +1,59 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "research-pilots"
+version = "0.2.1"
+description = "Multi-fidelity physics pretraining for L-band rough-surface scattering forward models"
+readme = "README.md"
+requires-python = ">=3.11,<3.14"
+license = { text = "BSD-3-Clause" }
+authors = [
+  { name = "Chengyue Huang" },
+  { name = "Pan Xiong" },
+  { name = "Jing Liu" },
+  { name = "Roberto Battiston" },
+  { name = "Angelo De Santis" },
+  { name = "Xuhui Shen" }
+]
+keywords = [
+  "microwave remote sensing",
+  "rough-surface scattering",
+  "physics-guided machine learning",
+  "multi-fidelity learning",
+  "domain transfer"
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: BSD License",
+  "Programming Language :: Python :: 3.11",
+  "Topic :: Scientific/Engineering"
+]
+dependencies = [
+  "numpy>=1.26",
+  "pandas>=2.1",
+  "scipy>=1.11",
+  "matplotlib>=3.8",
+  "scikit-learn>=1.4",
+  "Pillow>=10",
+  "PyYAML>=6"
+]
+
+[project.urls]
+Repository = "https://github.com/PANXIONG-CN/lband-physics-pretraining"
+
+[project.optional-dependencies]
+raw = ["h5py>=3.10", "rasterio>=1.3", "xlrd>=2.0.1"]
+dev = [
+  "jupyter>=1.1",
+  "pytest>=8"
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["scripts"]
+python_files = ["test_*.py"]

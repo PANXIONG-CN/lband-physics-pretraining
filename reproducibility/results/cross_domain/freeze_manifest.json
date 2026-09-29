@@ -1,0 +1,89 @@
+{
+  "created_utc": "2026-09-11T06:02:46.594165+00:00",
+  "status": "FROZEN_BEFORE_TARGET_SCORING",
+  "scientific_role": "immutable contract for one-time prospective SMEX02 zero-shot evaluation",
+  "files": {
+    "source_table": {
+      "path": "PROJECT_ROOT/outputs\\scattering\\rough_ground\\portable_source_v1\\smapvex12_portable_source.csv",
+      "bytes": 163744,
+      "sha256": "7b52a128dfbdd49c6270bc80203227cb63daa7f7e312a1f40a50c6ecbe15e785"
+    },
+    "external_table": {
+      "path": "PROJECT_ROOT/outputs\\scattering\\rough_ground\\smex02_external_final_20260911_v1\\smex02_field_day_model_ready.csv",
+      "bytes": 83083,
+      "sha256": "e984a1cf6b39a35f28e3087b7f13f22e7aaf0de0a3a4b2e843b7dc00f44fb408"
+    },
+    "final_intake_summary": {
+      "path": "PROJECT_ROOT/outputs\\scattering\\rough_ground\\smex02_external_final_20260911_v1\\summary.json",
+      "bytes": 2081,
+      "sha256": "0f0d04c1113dcc3f58c07e7f38e2a614a7ee6df9ba81ad08c1888204fda25f17"
+    },
+    "final_audit_summary": {
+      "path": "PROJECT_ROOT/outputs\\scattering\\rough_ground\\smex02_external_audit_final_20260911_v1\\summary.json",
+      "bytes": 2430,
+      "sha256": "88801d0e2affd437fa6c7fd760d6f4990a5cd1db106c1abe70565781b2640f05"
+    },
+    "stage5_manifest": {
+      "path": "PROJECT_ROOT/outputs\\scattering\\rough_ground\\stage5_freeze_20260910\\manifest.json",
+      "bytes": 6925,
+      "sha256": "c06b0ec0a40f1d41c3a23898d6f163084339bc744a31b53d075660bd0021bfe3"
+    },
+    "preregistration": {
+      "path": "PROJECT_ROOT/docs\\STAGE6_SMEX02_PREREGISTRATION.md",
+      "bytes": 5219,
+      "sha256": "8c3ba98ba9494166e4faf32256eb05a4d51d5afe8ad4187159bc955ddd317227"
+    },
+    "spm_teacher_samples": {
+      "path": "PROJECT_ROOT/outputs\\scattering\\rough_ground\\multifidelity_pretraining_20260910_v1\\spm_pretraining.csv",
+      "bytes": 656606,
+      "sha256": "2c8f6ffd86a6be9358d3838336513060e184f813757278a1ba579a0dfedc3657"
+    },
+    "i2em_requests": {
+      "path": "PROJECT_ROOT/outputs\\scattering\\rough_ground\\multifidelity_pretraining_20260910_v1\\i2em_train_requests.csv",
+      "bytes": 90748,
+      "sha256": "15d39664f59f64f6c75feb1574589fd76892848f5e8c57e58bfadaf0d87fad5b"
+    },
+    "i2em_results": {
+      "path": "PROJECT_ROOT/outputs\\scattering\\rough_ground\\multifidelity_pretraining_20260910_v1\\i2em_train_results.csv",
+      "bytes": 12511,
+      "sha256": "f5d1a666ba563d0ab05c79c59c00fbe495dd285dcc4b792c6b409a241f5e219b"
+    },
+    "evaluator": {
+      "path": "PROJECT_ROOT/scripts\\evaluate_smex02_prospective_zero_shot.py",
+      "bytes": 21611,
+      "sha256": "e42bf701f4912b7dd6e793ee97aaeae0a7accf1ecf725df8721e3dc34e5c81b8"
+    }
+  },
+  "locked_configuration": {
+    "dielectric_policy": "topp_both",
+    "feature_names": [
+      "soil_moisture_m3_m3",
+      "soil_real_dielectric",
+      "pals_rms_height_cm",
+      "pals_correlation_length_cm"
+    ],
+    "common_head_primary": "source-training mean",
+    "differential_head_primary": "SPM-to-I2EM sequential pretraining, source-real fitting, source-only grouped-CV shrinkage",
+    "spm_epochs": 200,
+    "i2em_epochs": 100,
+    "source_epochs": 120,
+    "source_inner_folds": 4,
+    "repeats": 5,
+    "shrinkage_candidates": [
+      0.0,
+      0.1,
+      0.25,
+      0.5,
+      0.75,
+      1.0
+    ],
+    "bootstrap_field_blocks": 4000,
+    "seed": 20260910,
+    "minimum_field_subgroup_rows": 3
+  },
+  "guardrails": [
+    "SMEX02 targets were not used to choose architecture, features, epochs, seeds, or shrinkage candidates.",
+    "Zero-shot scoring is run before any SMEX02 few-shot adaptation.",
+    "Any later method revision requires a new independent prospective domain."
+  ]
+}

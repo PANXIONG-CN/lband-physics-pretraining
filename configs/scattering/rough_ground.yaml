@@ -1,0 +1,31 @@
+study:
+  name: multifidelity_rough_surface_scattering
+  frequency_ghz: 1.26
+  reference_incidence_angle_deg: 40.0
+  polarization_order:
+    - HH
+    - VV
+
+physical_teachers:
+  low_fidelity: SPM
+  high_fidelity: I2EM
+  correlation_model: exponential
+  loss_tangent: 0.05
+  spm_validity:
+    ks_max: 0.30
+    rms_slope_max: 0.21
+
+sampling:
+  spm_samples: 4096
+  i2em_train_samples: 256
+  i2em_test_samples: 128
+  seed: 20260910
+
+training:
+  spm_epochs: 200
+  i2em_epochs: 100
+  repeats: 5
+
+notes:
+  - Frozen teacher tables are distributed under reproducibility/data/teachers.
+  - Paper-level experiments use their recorded manifests when settings differ.

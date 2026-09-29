@@ -1,0 +1,16 @@
+[
+  "scripts/build_mstar_scr_composites.py",
+  "scripts/explore_adaptsaps.py",
+  "scripts/build_mstar_index.py",
+  "scripts/analyze_controlled_scattering_features.py",
+  "scripts/inspect_mstar_archives.py",
+  "scripts/inspect_dataset.py",
+  "scripts/analyze_mstar_index.py",
+  "scripts/extract_mstar_scattering_features.py",
+  "scripts/read_mstar_sample.py",
+  "scripts/build_mstar_clutter_patches.py",
+  "scripts/train_mstar_feature_baselines.py",
+  "scripts/aggregate_mstar_scr_repeats.py",
+  "scripts/simulate_target_ground.py",
+  "scripts/train_mstar_scr_robustness_baselines.py"
+]

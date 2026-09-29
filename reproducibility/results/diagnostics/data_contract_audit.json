@@ -1,0 +1,98 @@
+{
+  "status": "NUMERICAL_REPLAY_PASSED_WITH_SEMANTIC_LIMITATIONS",
+  "scope": "Frozen-table reproducibility, not equal-footprint validation or new model evidence",
+  "checks": {
+    "unequal_power_unit_test": {
+      "result_db": -12.59637310505756,
+      "arithmetic_db_mean": -15.0,
+      "passed": true
+    },
+    "polarization_mapping": {
+      "source_column6": "VV",
+      "source_column7": "HH",
+      "target_L_HH": "HH",
+      "target_L_VV": "VV",
+      "passed": true
+    },
+    "source_raw_replay": {
+      "checked_rows": 240,
+      "max_absolute_errors": {
+        "sigma0_hh_db": 3.552713678800501e-15,
+        "sigma0_vv_db": 7.105427357601002e-15,
+        "pals_sample_count": 0.0
+      },
+      "passed": true
+    },
+    "source_soil_replay": {
+      "checked_rows": 240,
+      "max_absolute_errors": {
+        "soil_moisture_m3_m3": 9.71445146547012e-17,
+        "soil_real_dielectric": 7.105427357601002e-15
+      },
+      "passed": true
+    },
+    "source_saved_linear_mean": {
+      "sigma0_hh_db": 3.907985046680551e-14,
+      "sigma0_vv_db": 3.552713678800501e-14
+    },
+    "target_raw_replay": {
+      "checked_rows": 189,
+      "max_absolute_errors": {
+        "sigma0_hh_db": 3.552713678800501e-15,
+        "sigma0_vv_db": 3.552713678800501e-15,
+        "pals_sample_count": 0.0,
+        "incidence_angle_deg": 7.105427357601002e-15
+      },
+      "passed": true
+    },
+    "target_soil_replay": {
+      "checked_rows": 189,
+      "max_absolute_errors": {
+        "soil_moisture_m3_m3": 2.7755575615628914e-17
+      },
+      "passed": true
+    },
+    "target_dielectric_topp_max_error": 2.6645352591003757e-15,
+    "source_moisture_fraction_range": [
+      0.0552021875,
+      0.5822781333333332
+    ],
+    "target_moisture_fraction_range": [
+      0.051,
+      0.368
+    ],
+    "july06_retained_field_days": 30,
+    "target_files_inventoried": 111,
+    "target_rows_read": 51349
+  },
+  "input_sha256": {
+    "PROJECT_ROOT/outputs\\scattering\\rough_ground\\portable_source_v1\\smapvex12_portable_source.csv": "7b52a128dfbdd49c6270bc80203227cb63daa7f7e312a1f40a50c6ecbe15e785",
+    "PROJECT_ROOT/outputs\\scattering\\rough_ground\\smex02_external_final_20260911_v1\\smex02_field_day_model_ready.csv": "e984a1cf6b39a35f28e3087b7f13f22e7aaf0de0a3a4b2e843b7dc00f44fb408",
+    "PROJECT_ROOT/outputs\\scattering\\rough_ground\\smex02_preregistered_few_shot_20260911_v1\\heldout_predictions.csv": "4af77e2a4572db524e088404ba005459e4a1d3c09ddd2d56172ac65693d519dc",
+    "PROJECT_ROOT/src\\research_pilots\\scattering\\data\\read_smapvex.py": "7fb5c3d9f815af7599cd5b752074c1045fb825f160293fcf7dd457ecb41fc3f8",
+    "PROJECT_ROOT/src\\research_pilots\\scattering\\data\\read_smex02.py": "57eb47b5f3d4f0b59b7ea28a1e06b33e817bfe8b223948aaf22486eafaaad563",
+    "PROJECT_ROOT/scripts\\collocate_smapvex_ground.py": "978d41e4363e7a7770fbbb9d001786515754153f1d71e0a5eca223b3a83d607e",
+    "PROJECT_ROOT/scripts\\prepare_smex02_external.py": "44930da5fadc2ef7f23b5d3cdda34db13e4cc87d86961eb502dbf2f591273385"
+  },
+  "frozen_inputs_unchanged": true,
+  "source_cohort": {
+    "rows": 240,
+    "fields": 24,
+    "dates": 12
+  },
+  "target_cohort": {
+    "rows": 189,
+    "fields": 30,
+    "dates": 7
+  },
+  "semantic_findings": [
+    "Source matches daily eligible field centroids; target matches all available sampling nodes, then joins by date.",
+    "Both use 500 m thresholds but not identical support operators or antenna weighting.",
+    "Source QC uses all four polarizations in [-40,0] dB and heading flag zero; target thresholds HH/VV in [-50,10] dB and angle/geolocation bounds.",
+    "Source dielectric is field-aggregated probe measurement; target dielectric is a deterministic moisture polynomial.",
+    "Source roughness is PALS-direction; target pools grid and slope profiles. Physical equivalence is not established.",
+    "SMEX02 polar_angle is polarization rotation, but the legacy reader labels it antenna_roll_deg; this field is not selected by the matching or training feature pipeline.",
+    "Legacy source summary note mentions 600 m although recorded parameters and replay use 500 m.",
+    "Daily temporal association is not synchronous footprint matching; flight remarks are not an exhaustive QA mask."
+  ]
+}

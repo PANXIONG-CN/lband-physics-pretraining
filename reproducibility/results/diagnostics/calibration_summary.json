@@ -1,0 +1,170 @@
+{
+  "analysis_type": "POST_HOC; not model selection or new prospective validation",
+  "inference_limit": "Intervals reweight shared held-out field identities across all fixed splits. No refitting, no campaign resampling, no unconditional coverage claim. Repeated training dependence not fully propagated.",
+  "checks_passed": 60,
+  "bootstrap_draws": 4000,
+  "results": [
+    {
+      "nominal_fraction": 0.05,
+      "actual_fraction": 0.0666666666666666,
+      "rmse_db": {
+        "common_offset_source_mean": 4.303347559590873,
+        "scratch": 4.478686869656867,
+        "spm_only": 4.175475836762626,
+        "spm_to_i2em": 4.183423316827662,
+        "risk_spm_to_i2em": 4.293509962292324,
+        "two_mean": 4.170679774994317,
+        "two_mean_field_weighted": 4.174794243308433
+      },
+      "contrasts": {
+        "spm_only_minus_scratch": {
+          "delta_db": -0.30321103289424123,
+          "conditional_field_reweighting_interval": [
+            -0.3987442837068626,
+            -0.19933260627896965
+          ]
+        },
+        "spm_only_minus_two_mean": {
+          "delta_db": 0.0047960617683084905,
+          "conditional_field_reweighting_interval": [
+            -0.018295867619197215,
+            0.028917922754700523
+          ]
+        },
+        "spm_to_i2em_minus_spm_only": {
+          "delta_db": 0.007947480065036316,
+          "conditional_field_reweighting_interval": [
+            0.005346708233016861,
+            0.01062924492352424
+          ]
+        },
+        "two_mean_minus_common_offset_source_mean": {
+          "delta_db": -0.13266778459655537,
+          "conditional_field_reweighting_interval": [
+            -0.2142276594725987,
+            -0.046031560005046664
+          ]
+        }
+      }
+    },
+    {
+      "nominal_fraction": 0.1,
+      "actual_fraction": 0.1,
+      "rmse_db": {
+        "common_offset_source_mean": 4.251253899005988,
+        "scratch": 4.4337864531848075,
+        "spm_only": 4.100186524078089,
+        "spm_to_i2em": 4.107805270270654,
+        "risk_spm_to_i2em": 4.240568502710142,
+        "two_mean": 4.101154960636103,
+        "two_mean_field_weighted": 4.10362032516795
+      },
+      "contrasts": {
+        "spm_only_minus_scratch": {
+          "delta_db": -0.3335999291067182,
+          "conditional_field_reweighting_interval": [
+            -0.4309280763586199,
+            -0.22678059255997896
+          ]
+        },
+        "spm_only_minus_two_mean": {
+          "delta_db": -0.0009684365580140408,
+          "conditional_field_reweighting_interval": [
+            -0.014217756493942435,
+            0.01257446859584028
+          ]
+        },
+        "spm_to_i2em_minus_spm_only": {
+          "delta_db": 0.0076187461925645295,
+          "conditional_field_reweighting_interval": [
+            0.004342992751325525,
+            0.011043364071038808
+          ]
+        },
+        "two_mean_minus_common_offset_source_mean": {
+          "delta_db": -0.15009893836988475,
+          "conditional_field_reweighting_interval": [
+            -0.22641816446602137,
+            -0.0686628338169248
+          ]
+        }
+      }
+    },
+    {
+      "nominal_fraction": 0.2,
+      "actual_fraction": 0.2,
+      "rmse_db": {
+        "common_offset_source_mean": 4.222665052121867,
+        "scratch": 4.406306546882101,
+        "spm_only": 4.0578562192662435,
+        "spm_to_i2em": 4.058616531648906,
+        "risk_spm_to_i2em": 4.210241524641344,
+        "two_mean": 4.059592175911961,
+        "two_mean_field_weighted": 4.058291818584846
+      },
+      "contrasts": {
+        "spm_only_minus_scratch": {
+          "delta_db": -0.3484503276158577,
+          "conditional_field_reweighting_interval": [
+            -0.4599801339718697,
+            -0.23082791514338188
+          ]
+        },
+        "spm_only_minus_two_mean": {
+          "delta_db": -0.0017359566457173514,
+          "conditional_field_reweighting_interval": [
+            -0.01034149400143829,
+            0.0064050858777451565
+          ]
+        },
+        "spm_to_i2em_minus_spm_only": {
+          "delta_db": 0.000760312382662498,
+          "conditional_field_reweighting_interval": [
+            -0.00161229225665519,
+            0.0032076849147139267
+          ]
+        },
+        "two_mean_minus_common_offset_source_mean": {
+          "delta_db": -0.16307287620990607,
+          "conditional_field_reweighting_interval": [
+            -0.24795987062718589,
+            -0.07526113250362018
+          ]
+        }
+      }
+    }
+  ],
+  "domains": {
+    "SMAPVEX12": {
+      "n_rows": 240,
+      "n_fields": 24,
+      "angle_definition": "nominal_incidence_angle_deg",
+      "angle_min_median_max": [
+        40.0,
+        40.0,
+        40.0
+      ],
+      "angle_missing": 0,
+      "common_mean_db": -13.305323364034116,
+      "vv_minus_hh_mean_db": 0.7618139644972065
+    },
+    "SMEX02": {
+      "n_rows": 189,
+      "n_fields": 30,
+      "angle_definition": "incidence_angle_deg",
+      "angle_min_median_max": [
+        42.603325000000005,
+        44.411671428571424,
+        45.093207407407405
+      ],
+      "angle_missing": 0,
+      "common_mean_db": -16.054519365917663,
+      "vv_minus_hh_mean_db": -1.6752155788382765
+    }
+  },
+  "input_sha256": {
+    "predictions": "4af77e2a4572db524e088404ba005459e4a1d3c09ddd2d56172ac65693d519dc",
+    "target": "e984a1cf6b39a35f28e3087b7f13f22e7aaf0de0a3a4b2e843b7dc00f44fb408",
+    "source": "7b52a128dfbdd49c6270bc80203227cb63daa7f7e312a1f40a50c6ecbe15e785"
+  }
+}

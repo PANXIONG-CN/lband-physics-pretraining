@@ -1,0 +1,45 @@
+{
+  "status": "COMPLETE",
+  "analysis_role": "post-hoc calibration control on the shared physics-valid cohort",
+  "training_performed": false,
+  "model_selection_performed": false,
+  "cohort": {
+    "rows": 138,
+    "fields": 22
+  },
+  "offset_definition": "per-channel mean of observed minus physical prediction over common-valid rows in the original adaptation fields",
+  "heldout_labels_used_for_calibration": false,
+  "uncertainty": {
+    "method": "shared field-identity conditional reweighting across fixed splits",
+    "iterations": 10000,
+    "seed": 28260911
+  },
+  "risk_selected_weights_by_repeat": [
+    {
+      "repeat": 1,
+      "selected_weight": 0.1
+    },
+    {
+      "repeat": 2,
+      "selected_weight": 0.1
+    },
+    {
+      "repeat": 3,
+      "selected_weight": 0.0
+    },
+    {
+      "repeat": 4,
+      "selected_weight": 0.0
+    },
+    {
+      "repeat": 5,
+      "selected_weight": 0.0
+    }
+  ],
+  "inputs": {
+    "reproducibility\\results\\common_cohort\\predictions.csv": "0d07da4a3c7bc4cbce4c90be24b77f95bf802c82dfc9ebda355ce734c899bd96",
+    "reproducibility\\results\\cross_domain\\field_split_assignments.csv": "3c6d85e80258bb640632f9a11c6be8f3467118c6013952632e1a2ace15154ab3",
+    "reproducibility\\results\\cross_domain\\heldout_predictions.csv": "4af77e2a4572db524e088404ba005459e4a1d3c09ddd2d56172ac65693d519dc",
+    "outputs\\scattering\\rough_ground\\smex02_preregistered_few_shot_20260911_v1\\source_only_shrinkage_tuning.csv": "22e9933721bd3ac52bb37a4cc0f1ec4a795bb24d151f77aff46c0295df28489b"
+  }
+}
