@@ -13,11 +13,15 @@ authors. Corresponding authors: Pan Xiong and Xuhui Shen.
 
 ## Publication status
 
-The public repository has been created and initialized with a README. The
-complete version 0.2.1 code/data snapshot is supplied in the accompanying
-archive; its remote upload was not completed in this editing session.
-The commands below apply to the complete extracted companion or a fully
-populated repository checkout, not to the initial README-only repository.
+The complete version 0.2.1 code/data snapshot was published on 2026-09-29.
+The [first complete snapshot](https://github.com/PANXIONG-CN/lband-physics-pretraining/commit/853a71dab9854034b97d1e9aad556bf42aa050ca)
+contains all 279 release files, including processed data and archived validation
+logs. An independent checkout passed both SHA-256 manifests and matched the
+local release byte for byte. The existing repository history was preserved.
+
+The commands below work from a complete repository checkout or the accompanying
+archive. Validation reports under `tests/` preserve earlier scientific and
+editorial sessions; their pending-upload statements describe those past sessions.
 
 ## Quick start
 
@@ -79,18 +83,18 @@ Code: BSD-3-Clause. Original project-derived artifacts: CC BY 4.0 where the
 contributors hold the necessary rights. Third-party products retain their
 own terms (`LICENSE-DATA.md`, `THIRD_PARTY_NOTICES.md`).
 
-## Uploading to the initialized repository
+## Publishing a verified snapshot
 
 With Git and the GitHub CLI installed and authenticated as `PANXIONG-CN`,
-run from this complete companion directory:
+run from this complete companion directory. Before publishing deliberate changes,
+update the affected entries in `release_manifest.csv` so local verification passes:
 
 ```bash
 python publish_github.py            # local verification; no remote changes
 python publish_github.py --publish  # normal push preserving repository history
 ```
 
-Only manifest-listed code/data files are copied. The sibling private
-`manuscript/` directory is never included. The helper verifies the remote
-commit after pushing and prints its permanent URL. After a successful upload,
-update this publication-status paragraph; in the private manuscript set
-`RepositoryPublishedtrue` in `repository_info.tex` and rebuild both PDFs.
+Only manifest-listed code/data files are copied and staged, including archived
+validation logs explicitly listed in the manifest despite the general `*.log`
+ignore rule. The sibling private `manuscript/` directory is never included.
+The helper verifies the remote commit after pushing and prints its permanent URL.
