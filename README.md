@@ -5,6 +5,12 @@ Loss in Cross-Campaign Transfer of L-Band Scattering Surrogates*, version **0.2.
 The internal Python package is `research_pilots`. The fixed release and download
 are available at [v0.2.5](https://github.com/PANXIONG-CN/lband-physics-pretraining/releases/tag/v0.2.5).
 
+The 2026-09-30 TGRS submission figure update is available on `main`, including
+the `--submission` renderer and the 16 revised PDF assets. The software version
+remains 0.2.5. The fixed v0.2.5 tag, Release and download retain their earlier
+contents; use `main` for this submission update. Frozen data, statistical
+results and model weights are unchanged.
+
 ## Recalculate the paper results
 
 Run from the repository root using Python 3.11–3.13. The following commands use
@@ -17,17 +23,30 @@ uv pip sync requirements-reproducibility.txt
 uv pip install --no-deps -e .
 python scripts/diagnose_smex02_stage_retention.py --frozen-source-offset --output outputs/source_offset
 python scripts/recalculate_frozen_results.py --bundle reproducibility --output outputs/recalculated
-python scripts/render_tgrs_figures.py --compact-revision --output-root outputs/revised_figures
+python scripts/render_tgrs_figures.py --submission --output-root outputs/submission_figures
 python scripts/evaluate_physics_offset_baseline.py --output outputs/matched_information --bootstrap-iterations 10000
-python scripts/render_centered_panels.py --output outputs/centered_panels
 ```
 
 The source-intercept command evaluates five saved pretraining members, fits
 intercepts using source labels, and writes updated tables in the specified output
 directory. The recalculation command reproduces metrics, paired field-bootstrap
 intervals, error decomposition, within-field intervals, equal-field weighting
-and leave-one-date-out scores. Plotting uses the supplied frozen summaries.
-Run outputs are kept separate from `reproducibility/`.
+and leave-one-date-out scores. The submission renderer writes the 16 existing
+figure names as vector PDFs at 3.5- or 7.16-inch width, with embedded fonts. It
+reads the supplied summaries and repeats the existing deterministic SPM angle
+scan; the I²EM loss panel displays the recorded maxima across loss settings.
+The per-loss I²EM rows are not included, so no intermediate curve is inferred.
+Run outputs are kept separate from `reproducibility/`. To replace the bundled
+figure assets, use `--output-root reproducibility/figures` and copy those same
+PDF names to `../manuscript/figures/`. This editorial renderer does not retrain
+models or change the frozen numerical results.
+
+The accompanying manuscript follows the supplied IEEE journal template and
+compiles with `pdflatex`, BibTeX, and two more `pdflatex` passes for each of
+`main.tex` and `supplement.tex`. Run in the `manuscript/` directory; `IEEEtran`
+1.8b, the usual TeX packages, and `references.bib` are required. The source
+includes the supplied template's 2023 title-size definitions for compatibility
+with older installed copies of IEEEtran 1.8b. No additional class file is needed.
 
 Version 0.2.5 adds statistical comparisons, revised manuscript figures, and a
 fresh replay of the two existing ancillary source-domain controls. It retains

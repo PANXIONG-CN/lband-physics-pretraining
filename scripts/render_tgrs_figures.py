@@ -4,8 +4,9 @@
 1. 不训练模型；
 2. 不选择模型；
 3. 不修改冻结结果；
-4. 同时输出PDF和600 dpi PNG；
-5. 生成图件来源与SHA-256清单。
+4. --submission 按投稿栏宽覆盖既有16幅PDF，不新增清单或PNG；
+5. 历史输出模式保留PDF、PNG和来源清单。
+投稿模式重算既有SPM角度敏感性，I²EM损耗面板只使用已保存最大值。
 """
 
 from __future__ import annotations
@@ -1840,6 +1841,284 @@ def render_compact_revision(root: Path, output: Path) -> None:
     plt.close(fig)
 
 
+def render_submission(root: Path, output: Path) -> None:
+    """Redraw the 16 existing PDF assets at their final IEEE column widths.
+
+    Read the bundled summaries without changing predictions or fitted models.
+    The SPM angle/loss panel repeats the existing deterministic source scan;
+    the I2EM loss panel shows the recorded maxima (per-loss rows are not bundled).
+    This mode writes PDF assets only, and may overwrite those same asset names.
+    """
+    import sys
+    from matplotlib.ticker import MaxNLocator
+
+    results = root / "reproducibility/results"
+    output.mkdir(parents=True, exist_ok=True)
+    apply_tgrs_style()
+    plt.rcParams.update({
+        "font.sans-serif": ["Arial", "Helvetica", "Liberation Sans", "DejaVu Sans"],
+        "font.size": 9.5, "axes.labelsize": 9.5, "axes.titlesize": 9.5,
+        "xtick.labelsize": 9.5, "ytick.labelsize": 9.5, "legend.fontsize": 9.5,
+        "mathtext.fontset": "custom", "mathtext.rm": "Liberation Sans",
+        "mathtext.it": "Liberation Sans:italic", "mathtext.bf": "Liberation Sans:bold",
+        "pdf.fonttype": 42, "ps.fonttype": 42, "savefig.bbox": None,
+        "axes.linewidth": 0.7, "lines.linewidth": 1.2, "lines.markersize": 5,
+        "axes.spines.top": False, "axes.spines.right": False,
+    })
+    labels = dict(METHOD_LABELS, spm_to_i2em="Sequential", scratch="Random weights",
+                  spm_only="SPM pretraining", i2em_only="Direct neural",
+                  risk_spm_to_i2em="Archived shrinkage")
+    generated = []
+
+    def read(relative: str) -> pd.DataFrame:
+        path = results / relative
+        if not path.is_file():
+            raise FileNotFoundError(f"Required bundled plotting input: {path}")
+        return pd.read_csv(path)
+
+    def style(ax, panel: str = ""):
+        ax.grid(axis="y", color="0.87", linewidth=0.5)
+        ax.set_axisbelow(True)
+        ax.tick_params(width=0.7, length=3, pad=3)
+        if panel:
+            ax.set_title(f"({panel})", loc="left", pad=7, fontweight="bold")
+
+    def line(ax, x, y, method, **kwargs):
+        return ax.plot(x, y, label=labels.get(method, method),
+                       color=METHOD_COLORS[method], marker=METHOD_MARKERS[method],
+                       linestyle=METHOD_LINESTYLES[method], markerfacecolor="white",
+                       markeredgewidth=1.0, **kwargs)
+
+    def fields(ax):
+        ax.set_xticks([2, 3, 6]); ax.set_xlim(1.65, 6.35)
+        ax.set_xlabel("Adaptation fields (of 30)")
+
+    def legend(fig, ax, ncol=3, y=1.0):
+        handles, names = ax.get_legend_handles_labels()
+        fig.legend(handles, names, loc="upper center", bbox_to_anchor=(0.5, y),
+                   ncol=ncol, frameon=False, handlelength=2.3, columnspacing=1.2)
+
+    def save(fig, name):
+        fig.savefig(output / name, format="pdf", bbox_inches=None,
+                    metadata={"Creator": "Bundled TGRS figure renderer", "CreationDate": None})
+        plt.close(fig); generated.append(name)
+
+    # Teacher comparison: the fixed test cohort and the recorded loss maxima.
+    paired = read("multifidelity/paired_teacher_disagreement.csv")
+    test = paired.loc[paired["split"].eq("test")].copy()
+    if len(test) != 128:
+        raise ValueError("The teacher figure requires the fixed 128-sample test cohort.")
+    formal = json.loads((results / "paper_summaries/phase1_summary.json").read_text())["formal_multifidelity_test"]
+    fig, axes = plt.subplots(2, 2, figsize=(7.16, 5.25))
+    fig.subplots_adjust(left=.10, right=.98, bottom=.16, top=.94, wspace=.34, hspace=.54)
+    for ax, pol, panel in zip(axes[0], ["hh", "vv"], ["a", "b"]):
+        x, y = test[f"spm_{pol}_db"], test[f"i2em_{pol}_db"]
+        limits = [min(x.min(), y.min()) - .15, max(x.max(), y.max()) + .15]
+        ax.plot(limits, limits, "--", color=COLORS["mean"], linewidth=.9)
+        ax.scatter(x, y, s=16, color=COLORS["spm"], edgecolors="none")
+        ax.set(xlim=limits, ylim=limits, xlabel=f"SPM {pol.upper()} (dB)",
+               ylabel=f"I²EM {pol.upper()} (dB)")
+        ax.text(.03, .94, f"MAE = {np.mean(np.abs(x-y)):.3f} dB", transform=ax.transAxes, va="top")
+        style(ax, panel)
+    for stratum, marker, color, title in [
+        ("interior_le_0.4", "o", COLORS["spm"], "Interior (101)"),
+        ("middle_0.4_to_0.7", "s", COLORS["i2em"], "Intermediate (24)"),
+        ("nearer_boundary_gt_0.7", "^", COLORS["sequential"], "Near boundary (3)")]:
+        part = test.loc[test.validity_stratum.eq(stratum)]
+        axes[1, 0].scatter(part.i2em_validity_utilization,
+                           (part.teacher_absolute_delta_hh_db + part.teacher_absolute_delta_vv_db)/2,
+                           s=19, marker=marker, color=color, label=title)
+    u = test.i2em_validity_utilization.to_numpy()
+    delta = (test.teacher_absolute_delta_hh_db + test.teacher_absolute_delta_vv_db).to_numpy()/2
+    centers, values = [], []
+    for lo, hi in zip(np.linspace(0, 1, 6)[:-1], np.linspace(0, 1, 6)[1:]):
+        mask = (u > lo) & (u <= hi)
+        if mask.any(): centers.append(np.median(u[mask])); values.append(np.median(delta[mask]))
+    axes[1, 0].plot(centers, values, "k--", linewidth=1, label="Binned median")
+    axes[1, 0].set(xlabel="Domain utilization, u", ylabel="Mean |I²EM − SPM| (dB)", xlim=(0, 1))
+    handles, names = axes[1, 0].get_legend_handles_labels()
+    fig.legend(handles, names, loc="lower center", bbox_to_anchor=(.5, .004),
+               ncol=4, frameon=False, fontsize=9, handlelength=1.4, columnspacing=1.0)
+    style(axes[1, 0], "c")
+    ax = axes[1, 1]
+    vals = [formal["maximum_loss_change_hh_db"], formal["maximum_loss_change_vv_db"]]
+    for j, value in enumerate(vals):
+        ax.vlines(j, 0, value, color=COLORS["i2em"], linewidth=1.2)
+        ax.plot(j, value, "o" if j == 0 else "s", color=COLORS["i2em"])
+        ax.annotate(f"{value:.4f}", (j, value), xytext=(0, 6), textcoords="offset points", ha="center")
+    ax.set(xticks=[0, 1], xticklabels=["HH", "VV"], xlim=(-.6, 1.6), ylim=(0, .047),
+           ylabel="Maximum absolute change (dB)", xlabel="Loss tangent: 0–0.10; 18 anchors")
+    style(ax, "d"); save(fig, "fig02_teacher_comparison.pdf")
+
+    # Matched high-fidelity label budgets; error bars are repeat standard deviations.
+    frame = read("residual_baselines/summary.csv")
+    fig, ax = plt.subplots(figsize=(7.16, 3.65))
+    fig.subplots_adjust(left=.105, right=.98, bottom=.17, top=.73)
+    for method in ["spm_teacher", "i2em_only", "spm_to_i2em", "direct_ridge", "direct_rbf", "residual_ridge", "residual_rbf"]:
+        g = frame.loc[frame.method.eq(method)].sort_values("size")
+        mean, sd = g.rmse_mean_db.to_numpy(), g.rmse_std_db.to_numpy()
+        if np.any(mean - sd <= 0):
+            raise ValueError("A log-scale SD interval extends to a nonpositive value.")
+        ax.errorbar(g["size"], mean, yerr=sd, color=METHOD_COLORS[method],
+                    marker=METHOD_MARKERS[method], linestyle=METHOD_LINESTYLES[method],
+                    markerfacecolor="white", capsize=2.5, label=labels[method])
+    ax.set(yscale="log", xticks=[32, 64, 128, 256], xlabel="I²EM training labels",
+           ylabel="Average HH/VV RMSE (dB)")
+    style(ax); legend(fig, ax, 3); save(fig, "fig03_sample_efficiency.pdf")
+
+    # Source-stage point estimates and paired field-bootstrap intervals.
+    stage = read("stage_diagnostics/stage_metrics.csv").set_index("method")
+    keys = ["i2em_fixed40_teacher", "pretraining_only_surrogate", "source_finetuned_surrogate", "source_reset_adam_003", "pretraining_source_offset"]
+    names = ["I²EM, fixed 40°", "Pretraining only", "Source, inherited Adam", "Source, reset Adam", "Pretraining + source intercept"]
+    fig, ax = plt.subplots(figsize=(7.16, 2.80))
+    fig.subplots_adjust(left=.34, right=.97, bottom=.21, top=.96)
+    for j, (key, color, marker) in enumerate(zip(keys, [COLORS[k] for k in ["i2em", "spm", "sequential", "residual_ridge", "source_ridge"]], ["s", "o", "^", "D", "P"])):
+        row = stage.loc[key]; v = row.centered_skill
+        ax.errorbar(v, j, xerr=[[v-row.centered_skill_ci_low], [row.centered_skill_ci_high-v]],
+                    color=color, marker=marker, capsize=3, linestyle="none")
+    ax.set(yticks=range(5), yticklabels=names, xlabel="Differential centered skill", xlim=(-.78, .28), ylim=(4.6, -.6))
+    ax.axvline(0, color="0.3", linestyle="--", linewidth=.9); style(ax)
+    save(fig, "fig05_stage_retention.pdf")
+
+    # Label-information groups remain separate, each with its own matched mean.
+    matched = read("matched_information/metrics_summary.csv")
+    for name, methods in [
+        ("fig04a_physics_offset.pdf", ["two_channel_mean", "i2em_actual_angle_plus_offset"]),
+        ("fig04b_neural_transfer.pdf", ["two_channel_mean_all_adaptation", "spm_only", "spm_to_i2em", "risk_spm_to_i2em"])]:
+        fig, ax = plt.subplots(figsize=(3.50, 3.00))
+        fig.subplots_adjust(left=.19, right=.97, bottom=.18, top=.75)
+        for j, method in enumerate(methods):
+            g = matched.loc[matched.method.eq(method)].sort_values("requested_fraction")
+            alias = "two_mean" if method.startswith("two_channel_mean") else ("i2em_only" if method.startswith("i2em_actual") else method)
+            title = "Matched mean" if alias == "two_mean" else ("I²EM + offsets" if alias == "i2em_only" else labels[alias])
+            val = g.mean_channel_rmse_db.to_numpy()
+            # Horizontal offsets separate interval caps without changing field counts.
+            x = np.array([2., 3., 6.]) + (j-(len(methods)-1)/2)*.055
+            ax.errorbar(x, val, yerr=[val-g.conditional_ci_low_db.to_numpy(), g.conditional_ci_high_db.to_numpy()-val],
+                        color=METHOD_COLORS[alias], marker=METHOD_MARKERS[alias],
+                        linestyle=METHOD_LINESTYLES[alias], capsize=2, markerfacecolor="white", label=title)
+        ax.set_ylabel("Average HH/VV RMSE (dB)"); fields(ax); style(ax)
+        legend(fig, ax, 1 if len(methods)==2 else 2, 1.0)
+        save(fig, name)
+
+    response = read("diagnostics/response_summary.csv")
+    calibration = sorted(json.loads((results / "diagnostics/calibration_summary.json").read_text())["results"], key=lambda x: x["actual_fraction"])
+    fig, axes = plt.subplots(2, 2, figsize=(7.16, 5.00))
+    fig.subplots_adjust(left=.105, right=.98, bottom=.10, top=.88, wspace=.34, hspace=.58)
+    for method in ["scratch", "spm_only", "spm_to_i2em", "two_mean"]:
+        line(axes[0,0], [2,3,6], [r["rmse_db"][method] for r in calibration], method)
+    contrast = [r["contrasts"]["spm_only_minus_two_mean"] for r in calibration]
+    val = np.array([r["delta_db"] for r in contrast]); ci = np.array([r["conditional_field_reweighting_interval"] for r in contrast])
+    axes[0,1].errorbar([2,3,6], val, yerr=[val-ci[:,0], ci[:,1]-val], color=COLORS["spm"], marker="^", capsize=3, linestyle="none")
+    axes[0,1].axhline(0, color="0.3", linestyle="--", linewidth=.9)
+    axes[0,0].set_ylabel("Average HH/VV RMSE (dB)")
+    axes[0,1].set_ylabel("SPM − mean RMSE (dB)")
+    for ax, metric, scale, label in [(axes[1,0], "centered_skill", 1, "Differential centered skill"), (axes[1,1], "variance_ratio", 100, "Differential variance ratio (%)")]:
+        for method in ["spm_only", "spm_to_i2em", "two_mean"]:
+            g=response.loc[response.method.eq(method)&response.component.eq("differential")].sort_values("fraction")
+            line(ax, [2,3,6], g[metric].to_numpy()*scale, method)
+        ax.axhline(0, color="0.3", linestyle="--", linewidth=.8); ax.set_ylabel(label)
+    for ax, panel in zip(axes.flat, "abcd"): fields(ax); style(ax, panel)
+    legend(fig, axes[0,0], 4, 1.0); save(fig, "fig06_few_shot_transfer.pdf")
+
+    # Standalone paired panels use the same 3.5-inch width as the TeX subfigures.
+    for component in ["common", "differential"]:
+        for metric, suffix, letter in [("centered_skill", "skill", "a" if component=="common" else "c"),
+                                       ("variance_ratio", "variance", "b" if component=="common" else "d")]:
+            fig, ax=plt.subplots(figsize=(3.5, 3.3)); fig.subplots_adjust(left=.20, right=.97, bottom=.17, top=.68)
+            for method in ["scratch", "spm_only", "spm_to_i2em", "risk_spm_to_i2em", "two_mean"]:
+                g=response.loc[response.method.eq(method)&response.component.eq(component)].sort_values("fraction")
+                values=g[metric].to_numpy().copy(); values[np.abs(values)<1e-12]=0
+                line(ax, [2,3,6], values, method)
+            ax.axhline(0, color="0.3", linestyle="--", linewidth=.8)
+            ax.set_ylabel(("Centered skill" if metric=="centered_skill" else "Variance ratio"))
+            if component=="common": ax.set_ylim((0,.01) if metric=="variance_ratio" else (-.01,.01))
+            fields(ax); style(ax); legend(fig,ax,2,1.0)
+            save(fig, f"figS02{letter}_{component}_{suffix}.pdf")
+
+    # Deterministic SPM sensitivity from the original source scan, without training.
+    sys.path.insert(0, str(root / "src"))
+    from research_pilots.scattering.surfaces.spm import spm_backscatter_db
+    source = pd.read_csv(root / "reproducibility/data/source/smapvex12_portable_source.csv")
+    target = pd.read_csv(root / "reproducibility/data/target/smex02_field_day_model_ready.csv")
+    k=2*np.pi*1.26e9/299792458
+    valid=source.loc[(k*source.pals_rms_height_cm/100<=.3)&(source.pals_rms_height_cm>0)&(source.pals_correlation_length_cm>0)]
+    angles=[35,40,42.5,45,50]
+    fig, axes=plt.subplots(1,2,figsize=(7.16,2.80)); fig.subplots_adjust(left=.105,right=.98,bottom=.22,top=.78,wspace=.30)
+    for loss,marker,ls,col in zip([0,.02,.05,.1],["o","s","^","D"],["-","--","-.",":"],[COLORS[x] for x in ["spm","i2em","residual_ridge","sequential"]]):
+        values=[]
+        for angle in angles:
+            z=spm_backscatter_db(valid.soil_real_dielectric.to_numpy()*(1-1j*loss),valid.pals_rms_height_cm.to_numpy()/100,valid.pals_correlation_length_cm.to_numpy()/100,1.26e9,angle,spectrum_model="exponential")
+            values.append([np.median(z["hh_db"]),np.median(z["vv_db"])])
+        values=np.asarray(values)
+        for j,ax in enumerate(axes): ax.plot(angles,values[:,j],marker=marker,linestyle=ls,color=col,markerfacecolor="none",label=f"tan δ = {loss:.2f}")
+    for ax,panel,pol in zip(axes,"ab",["HH","VV"]):
+        ax.axvline(40,color="0.3",linestyle="--",linewidth=.8)
+        ax.set(xlabel="Incidence angle (°)",ylabel=f"Median SPM {pol} (dB)",xticks=[35,40,45,50]);style(ax,panel)
+    legend(fig,axes[0],4);save(fig,"figS01_angle_loss.pdf")
+
+    # Actual-angle control uses the stored paired field-bootstrap intervals.
+    fig,axes=plt.subplots(1,2,figsize=(7.16,2.70));fig.subplots_adjust(left=.105,right=.98,bottom=.23,top=.88,wspace=.34)
+    g=stage.loc[["i2em_fixed40_teacher","i2em_actual_angle_control"]]
+    for ax,metric,panel,label in zip(axes,["centered_skill","bias_db"],"ab",["Differential centered skill","Differential bias (dB)"]):
+        val=g[metric].to_numpy(); ax.errorbar([0,1],val,yerr=[val-g[f"{metric}_ci_low"].to_numpy(),g[f"{metric}_ci_high"].to_numpy()-val],marker="o",linestyle="none",color=COLORS["i2em"],capsize=3)
+        ax.axhline(0,color="0.3",linestyle="--",linewidth=.8)
+        ax.set(xticks=[0,1],xticklabels=["Fixed 40°","Actual incidence"],xlim=(-.4,1.4),ylabel=label);style(ax,panel)
+    save(fig,"figS05_angle_control.pdf")
+
+    # Differences in fixed alternative dielectric-input analyses.
+    dielectric=pd.DataFrame(json.loads((results/"diagnostics/dielectric_scores.json").read_text()))
+    fig,axes=plt.subplots(1,2,figsize=(7.16,2.90));fig.subplots_adjust(left=.105,right=.98,bottom=.21,top=.77,wspace=.36)
+    for method in ["spm_only","spm_to_i2em","two_channel_means"]:
+        g=dielectric.loc[dielectric.method.eq(method)]
+        a=g.loc[g.arm.eq("original")].set_index("fraction").sort_index();b=g.loc[g.arm.eq("unified")].set_index("fraction").sort_index()
+        for ax,metric in zip(axes,["rmse_mean_hh_vv_db","centered_skill_differential"]): line(ax,[2,3,6],a[metric].to_numpy()-b[metric].to_numpy(),method)
+    for ax,panel,label in zip(axes,"ab",["RMSE difference (dB)","Differential skill difference"]):
+        fields(ax);ax.set_ylabel(label);ax.axhline(0,color="0.3",linestyle="--",linewidth=.8);style(ax,panel)
+    legend(fig,axes[0],3);save(fig,"figS03_dielectric_sensitivity.pdf")
+
+    mismatch=read("controlled_mismatch/summary.csv")
+    mismatch=mismatch.loc[mismatch.noise_db.eq(0)&mismatch["size"].eq(32)]
+    scenarios=["none","offset","gain","nonlinear"]
+    fig,axes=plt.subplots(1,2,figsize=(7.16,2.55));fig.subplots_adjust(left=.105,right=.98,bottom=.21,top=.76,wspace=.34)
+    for j,(method,title,alias) in enumerate([("unadapted","Unadapted","spm_only"),("offset_calibrated","Offset calibrated","spm_to_i2em"),("adaptation_mean","Adaptation mean","two_mean"),("oracle_reference","Oracle reference","residual_ridge")]):
+        g=mismatch.loc[mismatch.method.eq(method)].set_index("scenario").loc[scenarios]
+        for ax,metric in zip(axes,["rmse_db","centered_rmse_db"]):
+            ax.plot(np.arange(4)+(j-1.5)*.1,g[metric],linestyle="none",marker=METHOD_MARKERS[alias],color=METHOD_COLORS[alias],label=title,markerfacecolor="white")
+    for ax,panel,label in zip(axes,"ab",["Average HH/VV RMSE (dB)","Centered RMSE (dB)"]):
+        ax.set(xticks=range(4),xticklabels=["None","Offset","Gain","Nonlinear"],ylabel=label,xlabel="Simulated mismatch");style(ax,panel)
+    # Keep the legend on one row, clear of the panel labels below it.
+    legend(fig,axes[0],4);save(fig,"figS04_controlled_mismatch.pdf")
+
+    fig,axes=plt.subplots(1,2,figsize=(7.16,2.55));fig.subplots_adjust(left=.105,right=.98,bottom=.21,top=.88,wspace=.32)
+    for ax,pol,panel in zip(axes,["hh","vv"],"ab"):
+        y=test[f"teacher_absolute_delta_{pol}_db"].to_numpy()
+        ax.scatter(u,y,s=18,color=COLORS["spm"],edgecolors="none")
+        xx,yy=[],[]
+        for lo,hi in zip(np.linspace(0,1,6)[:-1],np.linspace(0,1,6)[1:]):
+            mask=(u>lo)&(u<=hi)
+            if mask.any():xx.append(np.median(u[mask]));yy.append(np.median(y[mask]))
+        ax.plot(xx,yy,"s--",color=COLORS["sequential"],markersize=4,label="Binned median")
+        ax.set(xlabel="Domain utilization, u",ylabel=f"|I²EM − SPM|, {pol.upper()} (dB)",xlim=(0,1));style(ax,panel)
+    axes[1].legend(frameon=False,loc="upper left");save(fig,"figS06_teacher_domain.pdf")
+
+    fig,axes=plt.subplots(1,3,figsize=(7.16,2.50));fig.subplots_adjust(left=.08,right=.98,bottom=.22,top=.79,wspace=.42)
+    for j,(component,label) in enumerate([("common","Common component (dB)"),("differential","Differential component (dB)"),("angle","Incidence angle (°)")]):
+        values=[]
+        for frame,anglecol in [(source,"nominal_incidence_angle_deg"),(target,"incidence_angle_deg")]:
+            if component=="common":v=(frame.sigma0_hh_db+frame.sigma0_vv_db)/2
+            elif component=="differential":v=frame.sigma0_vv_db-frame.sigma0_hh_db
+            else:v=frame[anglecol]
+            values.append(v.to_numpy())
+        bins=np.linspace(min(np.min(v) for v in values),max(np.max(v) for v in values),13)
+        for v,title,color,ls in zip(values,["SMAPVEX12 (240)","SMEX02 (189)"],[COLORS["spm"],COLORS["sequential"]],["-","--"]):
+            axes[j].hist(v,bins=bins,density=True,histtype="step",color=color,linestyle=ls,linewidth=1.2,label=title)
+            axes[j].axvline(np.median(v),color=color,linestyle=ls,linewidth=.9)
+        axes[j].set(xlabel=label,ylabel="Density");axes[j].xaxis.set_major_locator(MaxNLocator(4));style(axes[j],"abc"[j])
+    legend(fig,axes[0],2);save(fig,"figS07_campaign_distributions.pdf")
+    print(f"Rendered {len(generated)} vector PDF assets in {output}")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description=(
@@ -1859,7 +2138,12 @@ def main() -> None:
     )
     parser.add_argument("--compact-revision", action="store_true",
                         help="Render the revised sample-efficiency and stage assets from reproducibility/")
+    parser.add_argument("--submission", action="store_true",
+                        help="Redraw all 16 existing PDF assets from the packaged results")
     args = parser.parse_args()
+    if args.submission:
+        render_submission(args.project_root.resolve(), args.output_root.resolve())
+        return
     if args.compact_revision:
         render_compact_revision(args.project_root.resolve(), args.output_root.resolve())
         return
