@@ -2,7 +2,7 @@
 """Recalculate published metrics and diagnostic decompositions from frozen tables.
 
 This command does not train models, regenerate I2EM outputs, or replay raw data.
-It preserves the uploaded numerical inputs and writes a separate result folder.
+It reads the supplied numerical inputs and writes recalculated result tables.
 The trajectory reconstruction is handled by verify_stage_continuity.py.
 """
 from __future__ import annotations
@@ -19,7 +19,65 @@ FEATURES = ['soil_moisture_m3_m3', 'soil_real_dielectric',
             'pals_rms_height_cm', 'pals_correlation_length_cm']
 STAGES = ['i2em_fixed40_teacher', 'pretraining_only_surrogate',
           'source_finetuned_surrogate', 'risk_shrunk_surrogate',
-          'i2em_actual_angle_control']
+          'i2em_actual_angle_control', 'pretraining_source_offset',
+          'source_reset_adam_003', 'source_mean']
+
+
+
+def unified_features(frame: pd.DataFrame) -> np.ndarray:
+    """Use the paper's Topp rule on both campaigns without modifying input tables."""
+    x = frame[FEATURES].to_numpy(dtype=float, copy=True)
+    mv = x[:, 0]
+    x[:, 1] = 3.03 + 9.3 * mv + 146.0 * mv**2 - 76.7 * mv**3
+    if not np.isfinite(x).all():
+        raise ValueError("Nonfinite scattering-model features")
+    return x
+
+
+def predict_saved_member(path: Path, features: np.ndarray,
+                         stage: str = 'pretraining') -> np.ndarray:
+    """Forward-only evaluation of archived tanh (4,16,8,1) NPZ arrays."""
+    x = np.asarray(features, dtype=float)
+    if x.ndim != 2 or x.shape[1] != len(FEATURES) or not np.isfinite(x).all():
+        raise ValueError("Expected finite N-by-4 input features")
+    with np.load(path, allow_pickle=False) as weights:
+        scale = weights['x_scale']
+        if np.any(scale <= 0):
+            raise ValueError("Invalid archived input scale")
+        h = (x - weights['x_mean']) / scale
+        for layer in range(3):
+            h = h @ weights[f'{stage}_coefs_{layer}'] + weights[f'{stage}_intercepts_{layer}']
+            if layer < 2:
+                h = np.tanh(h)
+        prediction = (h * weights['y_scale'] + weights['y_mean']).ravel()
+    if not np.isfinite(prediction).all():
+        raise ValueError("Nonfinite archived-network prediction")
+    return prediction
+
+
+def source_offset_predictions(weights_dir: Path, source: pd.DataFrame,
+                              target_features: np.ndarray) -> dict:
+    """Fit five source-only intercepts; target labels are not an input.
+
+    Averaging the five corrected predictions equals correcting the ensemble
+    by its source residual mean. All network parameters and scales stay fixed.
+    """
+    xs = unified_features(source)
+    ds = (source[YCOL[1]] - source[YCOL[0]]).to_numpy(float)
+    ps = np.stack([predict_saved_member(weights_dir / f'rebuilt_member_{j}.npz', xs)
+                   for j in range(1, 6)])
+    pt = np.stack([predict_saved_member(weights_dir / f'rebuilt_member_{j}.npz', target_features)
+                   for j in range(1, 6)])
+    intercepts = np.mean(ds[None, :] - ps, axis=1)
+    return {'source_predictions_by_member': ps,
+            'target_pretraining_by_member': pt,
+            'intercepts_by_member_db': intercepts,
+            'source_intercept_db': float(intercepts.mean()),
+            'target_offset_by_member': pt + intercepts[:, None],
+            'target_pretraining': pt.mean(axis=0),
+            'target_offset': (pt + intercepts[:, None]).mean(axis=0),
+            'common_source_mean_db': float(source[YCOL].to_numpy(float).mean()),
+            'differential_source_mean_db': float(ds.mean())}
 
 
 def read_table(path, required=(), unique_key=()):
@@ -79,7 +137,59 @@ def component_bootstrap(y, p, inv, w):
     my, mp = sy/n, sp/n
     vy, vp = np.maximum(sy2/n-my*my, 0), np.maximum(sp2/n-mp*mp, 0)
     cov = syp/n-my*mp
-    return {'skill': (2*cov-vp)/vy, 'bias': mp-my}
+    return {'skill': (2*cov-vp)/vy, 'bias': mp-my,
+            'rmse': np.sqrt(np.maximum((sp2 + sy2 - 2*syp)/n, 0))}
+
+
+def field_response_sensitivity(y, p, field, dates, weights, inverse):
+    """Score fixed predictions within fields, with equal field weights and by date.
+
+    The field bootstrap retains every observation in each sampled field. Dates,
+    model weights and source calibration stay fixed; deleting a date only rescores
+    the remaining predictions. No model is trained or selected here.
+    """
+    y, p = np.asarray(y, float), np.asarray(p, float)
+    field, dates = np.asarray(field), np.asarray(dates)
+    if not (y.shape == p.shape == field.shape == dates.shape):
+        raise ValueError('Response-sensitivity arrays must have equal length')
+    if not np.isfinite(y).all() or not np.isfinite(p).all():
+        raise ValueError('Nonfinite response-sensitivity input')
+    frame = pd.DataFrame({'field': field, 'y': y, 'p': p})
+    means = frame.groupby('field')[['y', 'p']].transform('mean')
+    yw, pw = y-means.y.to_numpy(), p-means.p.to_numpy()
+    within = component_metrics(yw, pw)
+    between = component_metrics(means.y, means.p)
+    total = component_metrics(y, p)
+    nf = weights.shape[1]
+    obs_ss = np.bincount(inverse, weights=yw**2, minlength=nf)
+    error_ss = np.bincount(inverse, weights=(pw-yw)**2, minlength=nf)
+    denom = weights @ obs_ss
+    if np.any(denom <= 0):
+        raise ValueError('A field bootstrap replicate has no within-field variance')
+    ci = np.quantile(1-(weights @ error_ss)/denom, [.025, .975])
+    # Each field has the same total weight, regardless of its date count.
+    sample_weight = 1/frame.groupby('field').y.transform('size').to_numpy(float)
+    yc = y-np.average(y, weights=sample_weight)
+    pc = p-np.average(p, weights=sample_weight)
+    equal_skill = 1-np.average((pc-yc)**2, weights=sample_weight)/np.average(yc**2, weights=sample_weight)
+    removed = {}
+    for date in sorted(pd.unique(dates)):
+        keep = dates != date
+        if keep.sum() < 2:
+            raise ValueError('Date deletion leaves fewer than two observations')
+        removed[str(date)] = component_metrics(y[keep], p[keep])['centered_skill']
+    return {'total_skill': total['centered_skill'],
+            'within_field_skill': within['centered_skill'],
+            'within_field_skill_ci_low': float(ci[0]),
+            'within_field_skill_ci_high': float(ci[1]),
+            'between_field_skill': between['centered_skill'],
+            'within_obs_variance_fraction': within['observed_variance']/total['observed_variance'],
+            'within_field_correlation': within['correlation'],
+            'between_field_correlation': between['correlation'],
+            'equal_field_weight_skill': float(equal_skill),
+            'leave_one_date_min_skill': min(removed.values()),
+            'leave_one_date_max_skill': max(removed.values()),
+            **{'leave_date_'+date+'_skill': value for date, value in removed.items()}}
 
 
 def shared_conditional_bootstrap(df, predictors, iterations, seed):
@@ -121,7 +231,7 @@ def main():
     args = ap.parse_args()
     root, out = args.bundle.resolve(), args.output.resolve()
     if out == root or root in out.parents:
-        raise ValueError('Write audit results outside the immutable input bundle')
+        raise ValueError('Choose an output directory outside the input bundle')
     out.mkdir(parents=True, exist_ok=True)
 
     checked_inputs = set()
@@ -210,6 +320,26 @@ def main():
     save(pd.DataFrame(splitchecks), 'split_checks.csv')
     save(pd.DataFrame(full_scores), 'full_fewshot_metrics_independent.csv')
 
+    offset_check = source_offset_predictions(root/'results/trajectory_reconstruction',
+                                             src, unified_features(zero))
+    np.testing.assert_allclose(zero.vv_pretraining_source_offset-zero.hh_pretraining_source_offset,
+                               offset_check['target_offset'], atol=1e-11, rtol=0)
+    joined_offset = stage[KEY+['differential_pretraining_source_offset']].merge(
+        zero[KEY+['hh_pretraining_source_offset','vv_pretraining_source_offset']],
+        on=KEY, validate='one_to_one')
+    np.testing.assert_allclose(joined_offset.differential_pretraining_source_offset,
+                               joined_offset.vv_pretraining_source_offset-joined_offset.hh_pretraining_source_offset,
+                               atol=1e-11, rtol=0)
+    reset_prediction = np.mean([
+        predict_saved_member(root/'results/trajectory_reconstruction'/f'rebuilt_member_{j}.npz',
+                             unified_features(zero), stage='source_reset_adam_003')
+        for j in range(1, 6)], axis=0)
+    np.testing.assert_allclose(zero.vv_source_reset_adam_003-zero.hh_source_reset_adam_003,
+                               reset_prediction, atol=1e-11, rtol=0)
+    reset_join = stage[KEY+['differential_source_reset_adam_003']].merge(
+        zero[KEY].assign(reset_prediction=reset_prediction), on=KEY, validate='one_to_one')
+    np.testing.assert_allclose(reset_join.differential_source_reset_adam_003,
+                               reset_join.reset_prediction, atol=1e-11, rtol=0)
     sy = stage.sigma0_vv_db-stage.sigma0_hh_db
     sm = pd.DataFrame([{'method': m, **component_metrics(sy, stage['differential_'+m])} for m in STAGES])
     stored = csv('results/stage_diagnostics/stage_metrics.csv').set_index('method')
@@ -225,24 +355,28 @@ def main():
     save(decomposition,'error_decomposition.csv')
     d=decomposition.set_index('method')
     changes=[]
-    for first,second in zip(STAGES[:3],STAGES[1:4]):
+    for first,second in [*zip(STAGES[:3],STAGES[1:4]),
+                         (STAGES[2], STAGES[6]), (STAGES[1], STAGES[6])]:
         changes.append({'first_stage':first,'second_stage':second,
           **{name:float(d.loc[second,name]-d.loc[first,name]) for name in ['bias_squared_db2','centered_mse_db2','mse_db2']}})
     save(pd.DataFrame(changes),'error_decomposition_changes.csv')
 
-    w, inv, _ = field_weights(stage.field_id, 10000, 27260910)
+    w, inv, _ = field_weights(stage.field_id.astype(str), 10000, 27260910)
     bs = {m: component_bootstrap(sy, stage['differential_'+m], inv, w) for m in STAGES}
     pairs, cis = [], []
     for m in STAGES:
         q = np.quantile(bs[m]['skill'], [.025, .975])
         cis.append({'method': m, 'skill_ci_low': q[0], 'skill_ci_high': q[1]})
-    for ia, ib in [(0, 1), (1, 2), (2, 3), (0, 4)]:
+    for ia, ib in [(0, 1), (1, 2), (2, 3), (0, 4), (1, 5), (2, 5), (2, 6), (1, 6), (6, 5), (7, 5)]:
         a, b = STAGES[ia], STAGES[ib]
         q = np.quantile(bs[b]['skill']-bs[a]['skill'], [.025, .975])
         qb = np.quantile(bs[b]['bias']-bs[a]['bias'], [.025, .975])
+        qr = np.quantile(bs[b]['rmse']-bs[a]['rmse'], [.025, .975])
         pairs.append({'first': a, 'second': b,
                       'delta_skill': sm.set_index('method').loc[b, 'centered_skill']-sm.set_index('method').loc[a, 'centered_skill'],
-                      'ci_low': q[0], 'ci_high': q[1], 'bias_ci_low': qb[0], 'bias_ci_high': qb[1]})
+                      'ci_low': q[0], 'ci_high': q[1], 'bias_ci_low': qb[0], 'bias_ci_high': qb[1],
+                      'delta_rmse_db': sm.set_index('method').loc[b,'rmse_db']-sm.set_index('method').loc[a,'rmse_db'],
+                      'rmse_ci_low_db': qr[0], 'rmse_ci_high_db': qr[1]})
     save(pd.DataFrame(cis), 'stage_bootstrap_intervals_independent.csv')
     save(pd.DataFrame(pairs), 'stage_pairwise_bootstrap_independent.csv')
 
@@ -291,16 +425,10 @@ def main():
 
     breakdown, leaveout, coverage, inbox = [], [], [], []
     for m in STAGES:
-        z = stage[['field_id']].copy()
-        z['y'], z['p'] = sy, stage['differential_'+m]
-        fieldmean = z.groupby('field_id')[['y', 'p']].transform('mean')
-        wi = component_metrics(z.y-fieldmean.y, z.p-fieldmean.p)
-        be = component_metrics(fieldmean.y, fieldmean.p)
-        total = component_metrics(z.y, z.p)
-        breakdown.append({'method': m, 'total_skill': total['centered_skill'],
-                          'within_field_skill': wi['centered_skill'], 'between_field_skill': be['centered_skill'],
-                          'within_obs_variance_fraction': wi['observed_variance']/total['observed_variance'],
-                          'within_field_correlation': wi['correlation'], 'between_field_correlation': be['correlation']})
+        sensitivity = field_response_sensitivity(
+            sy, stage['differential_'+m], stage.field_id,
+            stage.acquisition_date, w, inv)
+        breakdown.append({'method': m, **sensitivity})
         for f in sorted(stage.field_id.unique()):
             mask = stage.field_id != f
             leaveout.append({'method': m, 'left_out': f,
@@ -350,8 +478,12 @@ def main():
             'field_population': 'union of common-valid held-out fields (22)',
             'limitation': 'frozen models, adaptation sets and offsets; no source-training or campaign uncertainty'},
         'exploratory_within_between': breakdown, 'coverage': coverage,
+        'response_sensitivity_protocol': {'analysis_role': 'post-hoc fixed-prediction analysis',
+            'iterations': 10000, 'seed': 27260910, 'unit': 'field_id',
+            'date_deletion': 'one observed date removed at a time; no refitting',
+            'equal_field_weights': 'each observation has weight 1 / its field record count'},
         'not_verified_by_this_command': [
-                         'Source nested-CV and VWC OOF predictions absent',
+                         'Ancillary source-control replay; use audit_source_controls.py for supplied OOF evidence',
                          'Raw NSIDC collocation replay', 'SPM and MATLAB I2EM implementation',
                          'Historical ordering of model/protocol selection']}
     (out/'audit_summary.json').write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding='utf-8')

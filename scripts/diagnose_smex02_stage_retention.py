@@ -201,10 +201,192 @@ def save_angle_control_figure(metrics: pd.DataFrame, output: Path) -> None:
     plt.close(fig)
 
 
+
+def update_frozen_source_offset(root: Path, output: Path, iterations: int,
+                                seed: int) -> None:
+    """Reproduce the intercept control using saved weights and existing tables.
+
+    Output mirrors existing reproducibility paths. No neural fitting, new data,
+    optimizer reset, target-label calibration, or historical-result replacement.
+    """
+    from recalculate_frozen_results import (
+        KEY, YCOL, component_metrics, component_bootstrap, field_weights,
+        read_table, rmse_avg, source_offset_predictions, unified_features,
+    )
+    data = root / 'reproducibility'
+    source = read_table(data/'data/source/smapvex12_portable_source.csv', YCOL, KEY)
+    zero = read_table(data/'results/cross_domain/zero_shot_predictions.csv', YCOL, KEY)
+    stage = read_table(data/'results/stage_diagnostics/stage_predictions.csv', YCOL, KEY)
+    if len(source) != 240 or len(zero) != 189 or len(stage) != 138:
+        raise ValueError('The intercept control requires the original 240/189/138 cohorts')
+    control = source_offset_predictions(data/'results/trajectory_reconstruction',
+                                        source, unified_features(zero))
+    c = control['common_source_mean_db']
+    for method, values in [('pretraining_only', control['target_pretraining']),
+                           ('pretraining_source_offset', control['target_offset'])]:
+        zero[f'hh_{method}'] = c - values/2
+        zero[f'vv_{method}'] = c + values/2
+    prediction = zero[KEY].copy()
+    prediction['d_pre'] = control['target_pretraining']
+    prediction['d_offset'] = control['target_offset']
+    linked = stage[KEY].merge(prediction, on=KEY, validate='one_to_one')
+    np.testing.assert_allclose(linked.d_pre, stage.differential_pretraining_only_surrogate,
+                               atol=1e-11, rtol=0)
+    stage['differential_pretraining_source_offset'] = linked.d_offset.to_numpy()
+    stage['differential_source_mean'] = control['differential_source_mean_db']
+
+    def write_csv(frame, rel):
+        p = output/rel
+        p.parent.mkdir(parents=True, exist_ok=True)
+        frame.to_csv(p, index=False)
+
+    def write_json(value, rel):
+        p = output/rel
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(json.dumps(value, indent=2, ensure_ascii=False, allow_nan=False), encoding='utf-8')
+
+    # Retain original rows/columns and append the control under its own method name.
+    write_csv(zero, 'results/cross_domain/zero_shot_predictions.csv')
+    write_csv(stage, 'results/stage_diagnostics/stage_predictions.csv')
+    members = read_table(data/'results/trajectory_reconstruction/predictions_by_member.csv',
+                         ['repeat', 'd_pretraining'], ['repeat']+KEY)
+    for j in range(5):
+        select = members['repeat'].eq(j+1)
+        current = members.loc[select, KEY].merge(
+            zero[KEY].assign(pre=control['target_pretraining_by_member'][j]),
+            on=KEY, validate='one_to_one')
+        np.testing.assert_allclose(current.pre, members.loc[select, 'd_pretraining'],
+                                   atol=1e-11, rtol=0)
+        members.loc[select, 'source_offset_db'] = control['intercepts_by_member_db'][j]
+        members.loc[select, 'd_source_offset'] = (current.pre + control['intercepts_by_member_db'][j]).to_numpy()
+    write_csv(members, 'results/trajectory_reconstruction/predictions_by_member.csv')
+
+    methods = ['i2em_fixed40_teacher', 'pretraining_only_surrogate',
+               'source_finetuned_surrogate', 'risk_shrunk_surrogate',
+               'i2em_actual_angle_control', 'pretraining_source_offset']
+    if 'differential_source_reset_adam_003' in stage:
+        methods.append('source_reset_adam_003')
+    methods.append('source_mean')
+    y = (stage[YCOL[1]] - stage[YCOL[0]]).to_numpy(float)
+    # String ordering reproduces the original stage bootstrap's field universe.
+    w, inv, _ = field_weights(stage.field_id.astype(str), iterations, seed)
+    boot, points, rows = {}, {}, []
+    for method in methods:
+        p = stage[f'differential_{method}'].to_numpy(float)
+        values = component_metrics(y, p)
+        samples = component_bootstrap(y, p, inv, w)
+        counts = w @ np.bincount(inv, minlength=w.shape[1])
+        samples['rmse'] = np.sqrt((w @ np.bincount(inv, weights=(p-y)**2,
+                                                  minlength=w.shape[1]))/counts)
+        boot[method], points[method] = samples, values
+        rows.append({'method': method, 'n': len(y), **values,
+                     'centered_skill_ci_low': interval(samples['skill'])[0],
+                     'centered_skill_ci_high': interval(samples['skill'])[1],
+                     'centered_skill_probability_above_zero': float(np.mean(samples['skill'] > 0)),
+                     'bias_db_ci_low': interval(samples['bias'])[0],
+                     'bias_db_ci_high': interval(samples['bias'])[1],
+                     'rmse_db_ci_low': interval(samples['rmse'])[0],
+                     'rmse_db_ci_high': interval(samples['rmse'])[1]})
+    metrics = pd.DataFrame(rows)
+    original = pd.read_csv(data/'results/stage_diagnostics/stage_metrics.csv').set_index('method')
+    # Historical point estimates stay fixed; published intervals use the archived resampling settings.
+    common_cols = [col for col in original.columns if col in metrics.columns]
+    if (iterations, seed) != (10000, 27260910):
+        common_cols = [col for col in common_cols
+                       if '_ci_' not in col and '_probability_' not in col]
+    old_methods = [m for m in methods if m not in {'pretraining_source_offset', 'source_mean'} and m in original.index]
+    np.testing.assert_allclose(metrics.set_index('method').loc[old_methods, common_cols].to_numpy(float),
+                               original.loc[old_methods, common_cols].to_numpy(float), atol=1e-9, rtol=0)
+    write_csv(metrics, 'results/stage_diagnostics/stage_metrics.csv')
+    comparisons = [('training_stage', methods[0], methods[1]),
+                   ('training_stage', methods[1], methods[2]),
+                   ('training_stage', methods[2], methods[3]),
+                   ('observation_condition_control', methods[0], methods[4]),
+                   ('source_intercept_control', methods[1], methods[5]),
+                   ('source_intercept_control', methods[2], methods[5])]
+    if 'source_reset_adam_003' in methods:
+        comparisons.extend([('source_adam_reset_control', first, 'source_reset_adam_003')
+                            for first in ['source_finetuned_surrogate', 'pretraining_only_surrogate']])
+        comparisons.append(('source_intercept_control', 'source_reset_adam_003', 'pretraining_source_offset'))
+    comparisons.append(('source_intercept_control', 'source_mean', 'pretraining_source_offset'))
+    pairs = []
+    for role, first, second in comparisons:
+        a, b = boot[first], boot[second]
+        pairs.append({'comparison_type': role, 'first_stage': first, 'second_stage': second,
+            'centered_skill_delta_second_minus_first': points[second]['centered_skill']-points[first]['centered_skill'],
+            'centered_skill_delta_ci_low': interval(b['skill']-a['skill'])[0],
+            'centered_skill_delta_ci_high': interval(b['skill']-a['skill'])[1],
+            'bias_delta_second_minus_first_db': points[second]['bias_db']-points[first]['bias_db'],
+            'bias_delta_ci_low_db': interval(b['bias']-a['bias'])[0],
+            'bias_delta_ci_high_db': interval(b['bias']-a['bias'])[1],
+            'rmse_delta_second_minus_first_db': points[second]['rmse_db']-points[first]['rmse_db'],
+            'rmse_delta_ci_low_db': interval(b['rmse']-a['rmse'])[0],
+            'rmse_delta_ci_high_db': interval(b['rmse']-a['rmse'])[1]})
+    write_csv(pd.DataFrame(pairs), 'results/stage_diagnostics/stage_pairwise_deltas.csv')
+    joint = pd.read_csv(data/'results/cross_domain/zero_shot_joint_channel_metrics.csv')
+    for method in ['pretraining_only', 'pretraining_source_offset']:
+        p = zero[[f'hh_{method}', f'vv_{method}']].to_numpy(float)
+        channel_mse = np.mean((p-zero[YCOL].to_numpy(float))**2, axis=0)
+        joint = joint[joint.method.ne(method)]
+        joint = pd.concat([joint, pd.DataFrame([{
+            'method': method, 'mean_hh_vv_rmse_db': float(np.sqrt(channel_mse).mean()),
+            'pooled_hh_vv_rmse_db': float(np.sqrt(channel_mse.mean())),
+            'hh_rmse_db': float(np.sqrt(channel_mse[0])),
+            'vv_rmse_db': float(np.sqrt(channel_mse[1]))}])], ignore_index=True)
+    write_csv(joint, 'results/cross_domain/zero_shot_joint_channel_metrics.csv')
+    comparison = next(p for p in pairs if p['first_stage'] == 'source_finetuned_surrogate'
+                       and p['second_stage'] == 'pretraining_source_offset')
+    summary = {
+        'analysis_role': 'post-hoc source-intercept control',
+        'training_performed': False, 'target_labels_used_for_calibration': False,
+        'feature_rule': 'Topp dielectric on both campaigns; original NPZ scales fixed',
+        'source_rows': len(source), 'source_fields': int(source.field_id.nunique()),
+        'common_source_mean_db': c,
+        'source_intercept_db': control['source_intercept_db'],
+        'member_intercepts_db': control['intercepts_by_member_db'].tolist(),
+        'source_calibrated_mean_residual_db': float(np.mean(
+             control['source_predictions_by_member'] + control['intercepts_by_member_db'][:, None]
+             - (source[YCOL[1]]-source[YCOL[0]]).to_numpy(float)[None, :])),
+        'shared_138': {**points['pretraining_source_offset'],
+                      'source_mean_differential_rmse_db': component_metrics(
+                          y, np.full(len(y), control['differential_source_mean_db']))['rmse_db'],
+                      'offset_minus_finetuned': comparison,
+                      'paired_contrasts': [p for p in pairs if p['comparison_type'] == 'source_intercept_control']},
+        'full_189': {'rows': len(zero), 'fields': int(zero.field_id.nunique()),
+                     **component_metrics((zero[YCOL[1]]-zero[YCOL[0]]).to_numpy(float),
+                                          control['target_offset']),
+                     'mean_hh_vv_rmse_db': float(joint.set_index('method').loc['pretraining_source_offset','mean_hh_vv_rmse_db']),
+                     'mean_hh_vv_rmse_delta_vs_source_mean_db': float(
+                          joint.set_index('method').loc['pretraining_source_offset','mean_hh_vv_rmse_db']
+                          - joint.set_index('method').loc['source_mean','mean_hh_vv_rmse_db'])},
+        'bootstrap': {'unit': 'field_id', 'iterations': iterations, 'seed': seed,
+                      'source_intercept_fixed': True, 'paired_across_methods': True},
+        'original_primary_comparison': 'unchanged; this post-hoc branch is not pooled with original primary results',
+    }
+    for rel in ['results/cross_domain/zero_shot_summary.json',
+                'results/paper_summaries/phase3_summary.json',
+                'results/trajectory_reconstruction/summary.json']:
+        value = json.loads((data/rel).read_text())
+        value['posthoc_source_offset'] = summary
+        write_json(value, rel)
+    rel = 'results/stage_diagnostics/manifest.json'
+    manifest = json.loads((data/rel).read_text())
+    manifest['posthoc_source_offset'] = summary
+    manifest['source_offset_inputs'] = {
+        str(p.relative_to(root)): sha256(p) for p in [
+            data/'data/source/smapvex12_portable_source.csv',
+            data/'data/target/smex02_field_day_model_ready.csv',
+            *[data/f'results/trajectory_reconstruction/rebuilt_member_{j}.npz' for j in range(1, 6)]]}
+    write_json(manifest, rel)
+    print(json.dumps(summary, indent=2, ensure_ascii=False))
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--project-root", type=Path, default=Path(__file__).resolve().parents[1])
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--frozen-source-offset", action="store_true",
+                        help="Forward-only source intercept control from included NPZ weights; no training")
     parser.add_argument("--repeats", type=int, default=5)
     parser.add_argument("--spm-epochs", type=int, default=200)
     parser.add_argument("--i2em-epochs", type=int, default=100)
@@ -217,6 +399,9 @@ def main() -> None:
     if output.exists():
         raise FileExistsError(f"Output directory already exists: {output}")
     output.mkdir(parents=True)
+    if args.frozen_source_offset:
+        update_frozen_source_offset(root, output, args.bootstrap_iterations, args.seed + 7_000_000)
+        return
 
     scripts = root / "scripts"
     source_root = root / "src"

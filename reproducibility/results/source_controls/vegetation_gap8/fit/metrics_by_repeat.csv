@@ -1,0 +1,4 @@
+repeat,method,mean_channel_rmse_db
+1,ridge,3.2692760344693284
+1,ridge_vwc,3.2056363427223857
+1,training_mean,3.1135462249442902

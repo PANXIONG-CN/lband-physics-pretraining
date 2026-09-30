@@ -1,0 +1,150 @@
+{
+  "status": "passed",
+  "checks": {
+    "source_structure": {
+      "rows": 240,
+      "fields": 24,
+      "repeats": 5,
+      "methods": [
+        "components_multifidelity",
+        "components_scratch",
+        "components_spm",
+        "direct_multifidelity",
+        "direct_scratch",
+        "direct_spm",
+        "fixed_common_multifidelity",
+        "fixed_common_scratch",
+        "fixed_common_spm",
+        "ridge",
+        "training_mean"
+      ],
+      "outer_predictions": 13200,
+      "inner_predictions": 110400,
+      "summary": [
+        {
+          "method": "components_multifidelity",
+          "mean": 3.2708801225894844,
+          "std": 0.02373758283650148
+        },
+        {
+          "method": "components_scratch",
+          "mean": 3.383651719736465,
+          "std": 0.07615301254444624
+        },
+        {
+          "method": "components_spm",
+          "mean": 3.5540005745315897,
+          "std": 0.05332477439924001
+        },
+        {
+          "method": "direct_multifidelity",
+          "mean": 3.320676408562277,
+          "std": 0.03691458136024775
+        },
+        {
+          "method": "direct_scratch",
+          "mean": 3.4826351718696493,
+          "std": 0.0776336019557363
+        },
+        {
+          "method": "direct_spm",
+          "mean": 3.4953419513408948,
+          "std": 0.0846022134629281
+        },
+        {
+          "method": "fixed_common_multifidelity",
+          "mean": 3.1213949796165474,
+          "std": 0.0020004592503040405
+        },
+        {
+          "method": "fixed_common_scratch",
+          "mean": 3.1344978041223963,
+          "std": 0.012545676162969806
+        },
+        {
+          "method": "fixed_common_spm",
+          "mean": 3.1230250443976635,
+          "std": 0.002909353465999396
+        },
+        {
+          "method": "ridge",
+          "mean": 3.2692760344693284,
+          "std": 0.0
+        },
+        {
+          "method": "training_mean",
+          "mean": 3.1135462249442902,
+          "std": 0.0
+        }
+      ]
+    },
+    "vegetation_gap2/fit": {
+      "rows": 132,
+      "fields": 24,
+      "repeats": 1,
+      "methods": [
+        "ridge",
+        "ridge_vwc",
+        "training_mean"
+      ],
+      "outer_predictions": 396,
+      "inner_predictions": 5280,
+      "summary": [
+        {
+          "method": "ridge",
+          "mean": 3.2411242331645638,
+          "std": null
+        },
+        {
+          "method": "ridge_vwc",
+          "mean": 3.170646936114229,
+          "std": null
+        },
+        {
+          "method": "training_mean",
+          "mean": 3.118894691491093,
+          "std": null
+        }
+      ]
+    },
+    "vegetation_gap8/fit": {
+      "rows": 240,
+      "fields": 24,
+      "repeats": 1,
+      "methods": [
+        "ridge",
+        "ridge_vwc",
+        "training_mean"
+      ],
+      "outer_predictions": 720,
+      "inner_predictions": 9600,
+      "summary": [
+        {
+          "method": "ridge",
+          "mean": 3.2692760344693284,
+          "std": null
+        },
+        {
+          "method": "ridge_vwc",
+          "mean": 3.205636342722386,
+          "std": null
+        },
+        {
+          "method": "training_mean",
+          "mean": 3.1135462249442902,
+          "std": null
+        }
+      ]
+    },
+    "matching_gap2": {
+      "rows": 132,
+      "max_gap_days": 2,
+      "nearest_date_and_tie_rule": "passed"
+    },
+    "matching_gap8": {
+      "rows": 240,
+      "max_gap_days": 8,
+      "nearest_date_and_tie_rule": "passed"
+    }
+  }
+}

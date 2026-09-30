@@ -1,0 +1,73 @@
+{
+  "status": "complete",
+  "started_utc": "2026-09-30T09:03:24.590421+00:00",
+  "inputs": [
+    {
+      "path": "outputs/supplement_025/vegetation_gap8/matching/matched_source.csv",
+      "sha256": "c5ba5af01b552642e76a311c96ab9a63153330b6932519e0ea434da2ac294832"
+    }
+  ],
+  "script": {
+    "path": "scripts/review_source_structure.py",
+    "sha256": "3c164b86d5876daa9ff6544e82f55eb8fac69dc23193897a83994e3ba87b2781"
+  },
+  "sklearn_version": "1.8.0",
+  "environment": {
+    "python": "3.13.5",
+    "platform": "macOS-15.7.9-arm64-arm-64bit-Mach-O",
+    "numpy": "2.3.5",
+    "pandas": "2.2.3"
+  },
+  "threadpools": [
+    {
+      "user_api": "openmp",
+      "internal_api": "openmp",
+      "num_threads": 1,
+      "prefix": "libomp",
+      "version": null
+    }
+  ],
+  "rows": 240,
+  "fields": 24,
+  "dielectric": "topp_both",
+  "outer_folds": 5,
+  "inner_folds": 4,
+  "epochs": [
+    120,
+    300,
+    600
+  ],
+  "repeats": 1,
+  "design": "post-hoc source-domain structural control",
+  "centering": "one common scalar target scale; orthogonal rotation",
+  "fixed_common_control": "same fitted differential, common replaced",
+  "classical_only": true,
+  "with_vwc": true,
+  "seeds": [
+    20260917
+  ],
+  "ridge_alphas": [
+    0.0001,
+    0.01,
+    1.0,
+    100.0,
+    10000.0
+  ],
+  "neural_settings": {
+    "hidden_layer_sizes": [
+      16,
+      8
+    ],
+    "activation": "tanh",
+    "alpha": 0.001,
+    "spm_epochs": 200,
+    "i2em_epochs": 100,
+    "spm_learning_rate": 0.003,
+    "other_learning_rate": 0.001,
+    "optimizer": "Adam reset at each fit; warm-start weights",
+    "early_stopping": false,
+    "shuffle": true
+  },
+  "completed_utc": "2026-09-30T09:03:25.047495+00:00",
+  "elapsed_seconds": 0.4639662499539554
+}

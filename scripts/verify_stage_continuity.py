@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
-"""One fixed five-seed trajectory check using the uploaded training functions.
-No target labels are used for fitting or selection. No hyperparameter search
-is added. The source-only shrinkage selection is the historical four-fold rule.
-"""
+"""Reconstruct the archived trajectory or run its five-member reset-Adam control."""
 from __future__ import annotations
 import argparse, hashlib, importlib.metadata, json, platform, sys, time
 from pathlib import Path
@@ -24,12 +21,282 @@ def state(model):
       'batch_size':model.batch_size,'shuffle':bool(model.shuffle)}
 
 
+RESET_METHOD = 'source_reset_adam_003'
+MEMBER_SEEDS = (20260910, 20360910, 20460910, 20560910, 20660910)
+
+
+def restore_for_source_reset(weight_path: Path, seed: int):
+    """Load fixed pretraining arrays and allocate a fresh Adam without an update."""
+    from sklearn.utils import check_random_state
+    from sklearn.neural_network._stochastic_optimizers import AdamOptimizer
+    from research_pilots.scattering.surrogate.physics_pretraining import make_mlp
+
+    with np.load(weight_path, allow_pickle=False) as saved:
+        coefs = [saved[f'pretraining_coefs_{i}'].copy() for i in range(3)]
+        intercepts = [saved[f'pretraining_intercepts_{i}'].copy() for i in range(3)]
+        scales = {k: saved[k].copy() for k in ('x_mean', 'x_scale', 'y_mean', 'y_scale')}
+    for value, shape in zip(coefs + intercepts,
+                            [(4, 16), (16, 8), (8, 1), (16,), (8,), (1,)]):
+        if value.shape != shape or value.dtype != np.float64 or not np.isfinite(value).all():
+            raise ValueError(f'Invalid archived float64 network array: {weight_path}')
+    if any(not np.isfinite(v).all() for v in scales.values()) or any(
+            np.any(scales[k] <= 0) for k in ('x_scale', 'y_scale')):
+        raise ValueError(f'Invalid archived scales: {weight_path}')
+    model = make_mlp(seed, learning_rate=0.003)
+    model._random_state = check_random_state(seed)
+    model._initialize(np.zeros((1, 1)), [4, 16, 8, 1], np.dtype('float64'))
+    model.n_features_in_ = 4
+    model.coefs_, model.intercepts_ = coefs, intercepts
+    model._best_coefs = [v.copy() for v in coefs]
+    model._best_intercepts = [v.copy() for v in intercepts]
+    model._optimizer = AdamOptimizer(
+        coefs + intercepts, learning_rate_init=0.003,
+        beta_1=model.beta_1, beta_2=model.beta_2, epsilon=model.epsilon)
+    return model, scales
+
+
+def predict_reset_model(model, scales: dict, features: np.ndarray) -> np.ndarray:
+    """Return physical-unit differential predictions using the original scales."""
+    x = (np.asarray(features, dtype=np.float64) - scales['x_mean']) / scales['x_scale']
+    return (model.predict(x).reshape(-1, 1) * scales['y_scale'] + scales['y_mean']).ravel()
+
+
+def run_source_adam_reset(root: Path, atol: float = 1e-8) -> dict:
+    """Train only the five 120-epoch source stages and extend existing artifacts."""
+    from research_pilots.scattering.surrogate.physics_pretraining import train_epochs
+    from recalculate_frozen_results import (
+        KEY, YCOL, component_metrics, component_bootstrap, field_weights, rmse_avg)
+
+    data = root / 'reproducibility'
+    result = data / 'results'
+    trajectory = result / 'trajectory_reconstruction'
+    started = time.monotonic()
+
+    def read(rel):
+        frame = pd.read_csv(result / rel, dtype={'field_id': str})
+        if 'acquisition_date' in frame:
+            frame['acquisition_date'] = pd.to_datetime(frame.acquisition_date).dt.strftime('%Y-%m-%d')
+        return frame
+
+    def attach(frame, values, columns, keys=KEY):
+        linked = frame.drop(columns=columns, errors='ignore').merge(
+            values[list(keys) + list(columns)], on=list(keys), how='left',
+            sort=False, validate='one_to_one')
+        if len(linked) != len(frame) or linked[list(columns)].isna().any().any():
+            raise ValueError('Missing or duplicated field-date predictions')
+        return linked
+
+    def save(frame, rel):
+        path = result / rel
+        if not path.is_file():
+            raise FileNotFoundError(f'Expected an existing result file: {path}')
+        frame.to_csv(path, index=False)
+
+    def extend_rows(rel, rows, id_column, value):
+        frame = read(rel)
+        frame = frame.loc[frame[id_column].ne(value)]
+        save(pd.concat([frame, pd.DataFrame(rows)], ignore_index=True), rel)
+
+    source = audit.prepare_table(data/'data/source/smapvex12_portable_source.csv', 'SMAPVEX12', 'topp_both')
+    target = audit.prepare_table(data/'data/target/smex02_field_day_model_ready.csv', 'SMEX02', 'topp_both')
+    source = source.loc[source.finite_model_row].sort_values(KEY).reset_index(drop=True)
+    target = target.loc[target.finite_model_row].sort_values(KEY).reset_index(drop=True)
+    for frame, count, fields in [(source, 240, 24), (target, 189, 30)]:
+        frame['field_id'] = frame.field_id.astype(str)
+        frame['acquisition_date'] = frame.acquisition_date.dt.strftime('%Y-%m-%d')
+        if len(frame) != count or frame.field_id.nunique() != fields or frame.duplicated(KEY).any():
+            raise ValueError('Source/target cohort differs from the planned control')
+    xs = source[list(base.FEATURE_NAMES)].to_numpy(np.float64)
+    ds = (source[YCOL[1]] - source[YCOL[0]]).to_numpy(np.float64)
+    xt = target[list(base.FEATURE_NAMES)].to_numpy(np.float64)
+    c_source = float(source[YCOL].to_numpy(float).mean())
+    members = read('trajectory_reconstruction/predictions_by_member.csv')
+    stage = read('stage_diagnostics/stage_predictions.csv')
+    zero = read('cross_domain/zero_shot_predictions.csv')
+    if len(stage) != 138 or stage.field_id.nunique() != 22:
+        raise ValueError('The original common target cohort is required')
+    if len(members) != 5 * len(target) or set(members['repeat']) != set(range(1, 6)):
+        raise ValueError('Expected five complete archived members')
+    summary_path = trajectory/'summary.json'
+    archived = json.loads(summary_path.read_text())
+    column = 'd_' + RESET_METHOD
+    member_predictions, run_records, trained_arrays = [], [], []
+
+    with threadpool_limits(limits=1):
+        for repeat, seed in enumerate(MEMBER_SEEDS, 1):
+            path = trajectory/f'rebuilt_member_{repeat}.npz'
+            model, scales = restore_for_source_reset(path, seed)
+            before = state(model)
+            moment_zero = all(np.count_nonzero(v) == 0 for v in model._optimizer.ms + model._optimizer.vs)
+            with np.load(path, allow_pickle=False) as saved:
+                unchanged = all(np.array_equal(model.coefs_[i], saved[f'pretraining_coefs_{i}'])
+                                and np.array_equal(model.intercepts_[i], saved[f'pretraining_intercepts_{i}'])
+                                for i in range(3))
+            if not unchanged or not moment_zero or before['optimizer_t'] != 0:
+                raise ValueError('Reset initialization did not match the fixed starting state')
+            start_predictions = target[KEY].assign(d_start=predict_reset_model(model, scales, xt))
+            reference = members.loc[members['repeat'].eq(repeat)]
+            check = reference.merge(start_predictions, on=KEY, validate='one_to_one')
+            if len(check) != len(target):
+                raise ValueError('Incomplete starting-prediction comparison')
+            start_error = float(np.max(np.abs(check.d_start - check.d_pretraining)))
+            if start_error > atol:
+                raise ValueError(f'Member {repeat}: starting predictions differ by {start_error} dB')
+            scaled_x = (xs - scales['x_mean']) / scales['x_scale']
+            scaled_d = ((ds[:, None] - scales['y_mean']) / scales['y_scale']).ravel()
+            train_epochs(model, scaled_x, scaled_d, epochs=120, seed=seed + 10102)
+            after = state(model)
+            if after['optimizer_t'] != 240 or after['optimizer_learning_rate_init'] != 0.003 or len(model.loss_curve_) != 120:
+                raise ValueError('Reset source stage did not finish the specified updates')
+            pred = predict_reset_model(model, scales, xt)
+            if not np.isfinite(pred).all():
+                raise ValueError('Nonfinite reset-Adam predictions')
+            member_predictions.append(target[KEY].assign(repeat=repeat, **{column: pred}))
+            arrays = {}
+            for kind, values in [('coefs', model.coefs_), ('intercepts', model.intercepts_)]:
+                arrays.update({f'{RESET_METHOD}_{kind}_{i}': v.copy() for i, v in enumerate(values)})
+            trained_arrays.append((path, arrays))
+            old_member = next(m for m in archived['members'] if m['repeat'] == repeat)
+            run_records.append({
+                'repeat': repeat, 'seed': seed, 'source_order_seed': seed + 10102,
+                'epochs': len(model.loss_curve_), 'starting_arrays_equal': unchanged,
+                'starting_prediction_max_abs_difference_db': start_error,
+                'moments_initially_zero': moment_zero, 'initial_state': before,
+                'final_state': after, 'archived_source_state': old_member['source'],
+                'source_training_rmse_db': component_metrics(ds, predict_reset_model(model, scales, xs))['rmse_db']})
+            print(f'Reset-Adam member {repeat}/5: 120 epochs, 240 updates; starting difference {start_error:.3g} dB', flush=True)
+
+    new_members = pd.concat(member_predictions, ignore_index=True)
+    members = attach(members, new_members, [column], ['repeat'] + KEY)
+    ensemble = new_members.groupby(KEY, as_index=False)[column].mean()
+    new_stage = attach(stage, ensemble, [column])
+    new_stage['differential_' + RESET_METHOD] = new_stage.pop(column)
+    new_zero = attach(zero, ensemble, [column])
+    new_zero['hh_' + RESET_METHOD] = c_source - new_zero[column]/2
+    new_zero['vv_' + RESET_METHOD] = c_source + new_zero[column]/2
+    new_zero = new_zero.drop(columns=column)
+    y = (stage[YCOL[1]] - stage[YCOL[0]]).to_numpy(float)
+    p = new_stage['differential_' + RESET_METHOD].to_numpy(float)
+    methods = {RESET_METHOD: p,
+               'source_finetuned_surrogate': stage.differential_source_finetuned_surrogate.to_numpy(float),
+               'pretraining_only_surrogate': stage.differential_pretraining_only_surrogate.to_numpy(float)}
+    points = {m: component_metrics(y, pred) for m, pred in methods.items()}
+    w, inv, fields = field_weights(stage.field_id.astype(str), 10000, 27260910)
+    counts = w @ np.bincount(inv, minlength=len(fields))
+    boot = {}
+    for method, pred in methods.items():
+        boot[method] = component_bootstrap(y, pred, inv, w)
+        boot[method]['rmse'] = np.sqrt((w @ np.bincount(inv, weights=(pred-y)**2,
+                                                      minlength=len(fields))) / counts)
+    def interval(values):
+        return [float(v) for v in np.quantile(values, [0.025, 0.975])]
+    bs = boot[RESET_METHOD]
+    metric_row = {'method': RESET_METHOD, 'n': len(y), **points[RESET_METHOD],
+                  'centered_skill_probability_above_zero': float(np.mean(bs['skill'] > 0))}
+    for metric, score in [('centered_skill', 'skill'), ('bias_db', 'bias'), ('rmse_db', 'rmse')]:
+        metric_row[metric + '_ci_low'], metric_row[metric + '_ci_high'] = interval(bs[score])
+    paired = []
+    for first in ['source_finetuned_surrogate', 'pretraining_only_surrogate']:
+        row = {'comparison_type': 'source_adam_reset_control', 'first_stage': first,
+               'second_stage': RESET_METHOD}
+        for point_name, score, delta_name, low_name, high_name in [
+                ('centered_skill', 'skill', 'centered_skill_delta_second_minus_first', 'centered_skill_delta_ci_low', 'centered_skill_delta_ci_high'),
+                ('bias_db', 'bias', 'bias_delta_second_minus_first_db', 'bias_delta_ci_low_db', 'bias_delta_ci_high_db'),
+                ('rmse_db', 'rmse', 'rmse_delta_second_minus_first_db', 'rmse_delta_ci_low_db', 'rmse_delta_ci_high_db')]:
+            row[delta_name] = points[RESET_METHOD][point_name] - points[first][point_name]
+            row[low_name], row[high_name] = interval(bs[score] - boot[first][score])
+        paired.append(row)
+    member_metrics = []
+    for repeat in range(1, 6):
+        current = members.loc[members['repeat'].eq(repeat)]
+        for cohort, truth in [('shared_138', stage), ('full_189', target)]:
+            joined = truth[KEY + YCOL].merge(current, on=KEY, how='left', validate='one_to_one')
+            yd = (joined[YCOL[1]] - joined[YCOL[0]]).to_numpy(float)
+            for method, col in [('pretraining_only_surrogate', 'd_pretraining'),
+                                ('source_finetuned_surrogate', 'd_source'), (RESET_METHOD, column)]:
+                values = joined[col].to_numpy(float)
+                metrics = component_metrics(yd, values)
+                np.testing.assert_allclose(metrics['rmse_db']**2,
+                    metrics['bias_db']**2 + metrics['centered_rmse_db']**2, atol=1e-12, rtol=0)
+                member_metrics.append({'repeat': repeat, 'seed': MEMBER_SEEDS[repeat-1],
+                    'cohort': cohort, 'method': method, 'n': len(joined), **metrics,
+                    'mean_hh_vv_rmse_db': rmse_avg(joined[YCOL],
+                        np.column_stack([c_source-values/2, c_source+values/2]))})
+    full_y = (new_zero[YCOL[1]]-new_zero[YCOL[0]]).to_numpy(float)
+    full_p = (new_zero['vv_' + RESET_METHOD]-new_zero['hh_' + RESET_METHOD]).to_numpy(float)
+    full = {'rows': len(zero), 'fields': int(zero.field_id.nunique()), **component_metrics(full_y, full_p),
+            'mean_hh_vv_rmse_db': rmse_avg(zero[YCOL], new_zero[['hh_' + RESET_METHOD, 'vv_' + RESET_METHOD]])}
+    record = {
+        'status': 'COMPLETE', 'analysis_role': 'post-hoc source-stage optimizer-state control',
+        'training_performed': True, 'training_runs': 5, 'epochs_per_member': 120,
+        'source_rows': len(source), 'source_fields': int(source.field_id.nunique()),
+        'architecture': [4, 16, 8, 1], 'activation': 'tanh', 'alpha': 0.001,
+        'optimizer': {'name': 'Adam', 'learning_rate_init': 0.003, 'beta_1': 0.9,
+                      'beta_2': 0.999, 'epsilon': 1e-8, 'reset': 'first/second moments and update clock'},
+        'batch_size': 'auto', 'source_minibatch_sizes': [200, 40], 'shuffle': False,
+        'endpoint': 'epoch 120', 'feature_rule': 'Topp on both campaigns; NPZ standardization unchanged',
+        'common_source_mean_db': c_source, 'target_labels_used_for_training_or_selection': False,
+        'original_primary_comparison': 'unchanged',
+        'environment': {'python': platform.python_version(), 'platform': platform.platform(),
+                        **{p: importlib.metadata.version(p) for p in ['numpy', 'scipy', 'pandas', 'scikit-learn', 'threadpoolctl']},
+                        'training_threads': 1, 'dtype': 'float64'},
+        'members': run_records, 'member_metrics': member_metrics,
+        'shared_138': metric_row, 'full_189': full, 'paired_contrasts': paired,
+        'bootstrap': {'unit': 'field_id', 'iterations': 10000, 'seed': 27260910,
+                      'field_order': 'string sorted', 'fields': len(fields), 'models_fixed': True},
+        'elapsed_seconds': time.monotonic() - started}
+
+    # Extend existing artifacts only, retaining all historical columns and arrays.
+    for path, arrays in trained_arrays:
+        with np.load(path, allow_pickle=False) as saved:
+            original = {k: saved[k].copy() for k in saved.files}
+        original.update(arrays)
+        np.savez_compressed(path, **original)
+    save(members, 'trajectory_reconstruction/predictions_by_member.csv')
+    save(attach(read('trajectory_reconstruction/ensemble_comparison.csv'), ensemble, [column]),
+         'trajectory_reconstruction/ensemble_comparison.csv')
+    save(new_stage, 'stage_diagnostics/stage_predictions.csv')
+    save(new_zero, 'cross_domain/zero_shot_predictions.csv')
+    extend_rows('stage_diagnostics/stage_metrics.csv', [metric_row], 'method', RESET_METHOD)
+    extend_rows('stage_diagnostics/stage_pairwise_deltas.csv', paired, 'comparison_type', 'source_adam_reset_control')
+    channel_mse = np.mean((new_zero[['hh_' + RESET_METHOD, 'vv_' + RESET_METHOD]].to_numpy(float)
+                          - zero[YCOL].to_numpy(float))**2, axis=0)
+    extend_rows('cross_domain/zero_shot_joint_channel_metrics.csv', [{
+        'method': RESET_METHOD, 'mean_hh_vv_rmse_db': float(np.sqrt(channel_mse).mean()),
+        'pooled_hh_vv_rmse_db': float(np.sqrt(channel_mse.mean())),
+        'hh_rmse_db': float(np.sqrt(channel_mse[0])), 'vv_rmse_db': float(np.sqrt(channel_mse[1]))}],
+        'method', RESET_METHOD)
+    for rel in ['trajectory_reconstruction/summary.json', 'stage_diagnostics/manifest.json',
+                'cross_domain/zero_shot_summary.json', 'paper_summaries/phase3_summary.json']:
+        path = result / rel
+        content = json.loads(path.read_text())
+        content[RESET_METHOD] = record
+        # The saved networks gained keys; keep the existing offset-input hashes current.
+        if 'source_offset_inputs' in content:
+            for key in content['source_offset_inputs']:
+                if key.endswith('.npz'):
+                    content['source_offset_inputs'][key] = hashlib.sha256((root/key).read_bytes()).hexdigest()
+        path.write_text(json.dumps(content, ensure_ascii=False, indent=2, allow_nan=False), encoding='utf-8')
+    print(json.dumps({'shared_138': metric_row, 'full_189': full, 'paired_contrasts': paired}, indent=2), flush=True)
+    return record
+
+
 def main():
     ap=argparse.ArgumentParser(description=__doc__)
     ap.add_argument('--project-root',type=Path,default=ROOT)
-    ap.add_argument('--output',type=Path,required=True)
+    ap.add_argument('--output',type=Path,help='New output directory for full trajectory reconstruction')
+    ap.add_argument('--reset-source-adam', action='store_true',
+                    help='Train the fixed five-member source reset control and extend existing result files')
     ap.add_argument('--atol',type=float,default=1e-8)
-    a=ap.parse_args();root=a.project_root.resolve();out=a.output.resolve()
+    a=ap.parse_args();root=a.project_root.resolve()
+    if a.reset_source_adam:
+        if a.output is not None:
+            ap.error('--reset-source-adam updates the existing reproducibility files; omit --output')
+        run_source_adam_reset(root, a.atol)
+        return
+    if a.output is None:
+        ap.error('--output is required for full trajectory reconstruction')
+    out=a.output.resolve()
     out.mkdir(parents=True,exist_ok=False); data=root/'reproducibility';start=time.monotonic()
     source=audit.prepare_table(data/'data/source/smapvex12_portable_source.csv','SMAPVEX12','topp_both')
     source=source.loc[source.finite_model_row].sort_values(['field_id','acquisition_date']).reset_index(drop=True)

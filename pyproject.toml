@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "research-pilots"
-version = "0.2.2"
-description = "Multi-fidelity physics pretraining for L-band rough-surface scattering forward models"
+version = "0.2.5"
+description = "Bias-response separation and stage-wise diagnostics of L-band physics-pretrained scattering surrogates"
 readme = "README.md"
 requires-python = ">=3.11,<3.14"
 license = { text = "BSD-3-Clause" }

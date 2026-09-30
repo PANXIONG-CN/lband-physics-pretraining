@@ -5,8 +5,11 @@ import argparse
 import copy
 import hashlib
 import json
+import platform
 import sys
+import time
 import warnings
+from datetime import datetime, timezone
 
 import numpy as np
 import pandas as pd
@@ -17,6 +20,7 @@ from sklearn.model_selection import GroupKFold
 from sklearn.neural_network import MLPRegressor
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
+from threadpoolctl import threadpool_info, threadpool_limits
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
@@ -25,8 +29,7 @@ from research_pilots.scattering.surfaces.teacher_contract import (
     validate_teacher_results,
 )
 
-BASE = ROOT / "outputs/scattering/rough_ground"
-SIM = BASE / "multifidelity_pretraining_20260910_v1"
+DATA = ROOT / "reproducibility/data"
 
 FEATURES = [
     "soil_moisture_m3_m3",
@@ -48,7 +51,7 @@ def topp(m):
 def fingerprint(path):
     path = Path(path)
     return {
-        "path": str(path.resolve()),
+        "path": str(path.resolve().relative_to(ROOT)) if path.resolve().is_relative_to(ROOT) else path.name,
         "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
     }
 
@@ -167,16 +170,18 @@ def fixed_common(prediction, training_y):
     return p
 
 
-def fit_ridge(x, y, groups):
+def fit_ridge(x, y, groups, record_inner=None):
     candidates = [1e-4, 1e-2, 1.0, 100.0, 10000.0]
     splits = list(GroupKFold(4).split(x, groups=groups))
     losses = []
     for alpha in candidates:
         oof = np.full_like(y, np.nan)
-        for tr, va in splits:
+        for inner_id, (tr, va) in enumerate(splits, start=1):
             model = make_pipeline(StandardScaler(), Ridge(alpha=alpha))
             model.fit(x[tr], y[tr])
             oof[va] = model.predict(x[va])
+            if record_inner is not None:
+                record_inner(inner_id, va, oof[va], candidate_alpha=alpha)
         losses.append(mean_channel_rmse(y, oof))
     selected = candidates[int(np.argmin(losses))]
     model = make_pipeline(StandardScaler(), Ridge(alpha=selected))
@@ -184,12 +189,32 @@ def fit_ridge(x, y, groups):
     return model, selected
 
 
+def grouped_assignments(frame):
+    """Explicit held-out membership for the original deterministic group folds."""
+    groups = frame["field_id"].to_numpy()
+    outer = list(GroupKFold(5).split(frame, groups=groups))
+    outer_rows, inner_rows = [], []
+    for fold, (train, test) in enumerate(outer, start=1):
+        part = frame.loc[test, ["field_id", "acquisition_date"]].copy()
+        part["row_id"], part["fold"] = test, fold
+        outer_rows.append(part)
+        for inner_fold, (_, valid) in enumerate(
+            GroupKFold(4).split(frame.iloc[train], groups=groups[train]), start=1
+        ):
+            part = frame.loc[train[valid], ["field_id", "acquisition_date"]].copy()
+            part["row_id"] = train[valid]
+            part["fold"], part["inner_fold"] = fold, inner_fold
+            inner_rows.append(part)
+    return outer, pd.concat(outer_rows, ignore_index=True), pd.concat(inner_rows, ignore_index=True)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--input", type=Path,
-        default=BASE / "portable_source_v1/smapvex12_portable_source.csv",
+        default=DATA / "source/smapvex12_portable_source.csv",
     )
+    parser.add_argument("--teacher-dir", type=Path, default=DATA / "teachers")
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--repeats", type=int, default=5)
     parser.add_argument("--epochs", type=int, nargs="+", default=[120, 300, 600])
@@ -198,6 +223,7 @@ def main():
     parser.add_argument("--classical-only", action="store_true")
     parser.add_argument("--with-vwc", action="store_true")
     args = parser.parse_args()
+    started = time.monotonic()
 
     checkpoints = sorted(set(args.epochs))
     if min(checkpoints) < 1 or args.repeats < 1:
@@ -221,9 +247,9 @@ def main():
     args.output.mkdir(parents=True)
     paths = [args.input]
     if not args.classical_only:
-        spm_path = SIM / "spm_pretraining.csv"
-        req_path = SIM / "i2em_train_requests.csv"
-        res_path = SIM / "i2em_train_results.csv"
+        spm_path = args.teacher_dir / "spm_pretraining.csv"
+        req_path = args.teacher_dir / "i2em_train_requests.csv"
+        res_path = args.teacher_dir / "i2em_train_results.csv"
         paths += [spm_path, req_path, res_path]
 
         spm = pd.read_csv(spm_path)
@@ -247,9 +273,13 @@ def main():
 
     manifest = {
         "status": "running",
+        "started_utc": datetime.now(timezone.utc).isoformat(),
         "inputs": [fingerprint(p) for p in paths],
         "script": fingerprint(__file__),
         "sklearn_version": sklearn.__version__,
+        "environment": {"python": platform.python_version(), "platform": platform.platform(),
+                        "numpy": np.__version__, "pandas": pd.__version__},
+        "threadpools": [{k: v for k, v in p.items() if k != "filepath"} for p in threadpool_info()],
         "rows": len(frame),
         "fields": int(frame.field_id.nunique()),
         "dielectric": "topp_both",
@@ -260,12 +290,26 @@ def main():
         "design": "post-hoc source-domain structural control",
         "centering": "one common scalar target scale; orthogonal rotation",
         "fixed_common_control": "same fitted differential, common replaced",
+        "classical_only": args.classical_only,
+        "with_vwc": args.with_vwc,
+        "seeds": [20260917 + i * 10000 for i in range(1 if args.classical_only else args.repeats)],
+        "ridge_alphas": [1e-4, 1e-2, 1.0, 100.0, 10000.0],
+        "neural_settings": {"hidden_layer_sizes": [16, 8], "activation": "tanh",
+                            "alpha": 0.001, "spm_epochs": args.spm_epochs,
+                            "i2em_epochs": args.i2em_epochs,
+                            "spm_learning_rate": 0.003, "other_learning_rate": 0.001,
+                            "optimizer": "Adam reset at each fit; warm-start weights",
+                            "early_stopping": False, "shuffle": True},
     }
     manifest_path = args.output / "manifest.json"
     manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
 
     predictions, tuning, diagnostics = [], [], []
-    outer = list(GroupKFold(5).split(x, groups=groups))
+    outer, outer_assignments, inner_assignments = grouped_assignments(frame)
+    outer_assignments.to_csv(args.output / "outer_fold_assignments.csv", index=False)
+    inner_assignments.to_csv(args.output / "inner_fold_assignments.csv", index=False)
+    frame.to_csv(args.output / "analysis_input.csv", index=False)
+    inner_path = args.output / "inner_oof_predictions.csv"
     repeats = 1 if args.classical_only else args.repeats
 
     for repeat in range(repeats):
@@ -288,6 +332,18 @@ def main():
                 }
 
         for fold, (train, test) in enumerate(outer, start=1):
+            def record_inner(method, inner_id, valid, predicted, **candidate):
+                rows = train[valid]
+                part = frame.loc[rows, ["field_id", "acquisition_date"]].copy()
+                part["row_id"] = rows
+                part["repeat"], part["fold"], part["inner_fold"] = repeat + 1, fold, inner_id
+                part["method"] = method
+                part["candidate_epochs"] = candidate.get("candidate_epochs", np.nan)
+                part["candidate_alpha"] = candidate.get("candidate_alpha", np.nan)
+                part["observed_hh"], part["observed_vv"] = y[rows, 0], y[rows, 1]
+                part["predicted_hh"], part["predicted_vv"] = predicted[:, 0], predicted[:, 1]
+                part.to_csv(inner_path, mode="a", header=not inner_path.exists(), index=False)
+
             fold_predictions = {
                 "training_mean": np.tile(y[train].mean(axis=0), (len(test), 1))
             }
@@ -295,7 +351,8 @@ def main():
                 if data is None:
                     continue
                 model, alpha = fit_ridge(
-                    data[train], y[train], groups[train]
+                    data[train], y[train], groups[train],
+                    lambda inner_id, valid, p, **candidate: record_inner(name, inner_id, valid, p, **candidate),
                 )
                 fold_predictions[name] = model.predict(data[test])
                 tuning.append({
@@ -324,6 +381,7 @@ def main():
                                 inner_pred[b] = predict_heads(
                                     model, xn[train[b]], rotation, y_mean, y_scale
                                 )
+                                record_inner(method, inner_id + 1, b, inner_pred[b], candidate_epochs=epochs)
                             score = mean_channel_rmse(y[train], inner_pred)
                             scores.append(score)
                             tuning.append({
@@ -333,6 +391,8 @@ def main():
                             })
 
                         selected = checkpoints[int(np.argmin(scores))]
+                        tuning.append({"repeat": repeat + 1, "fold": fold,
+                                       "method": method, "selected_epochs": selected})
                         model = fit_heads(
                             initial, xn[train], z[train],
                             selected, seed + fold * 1000, 1e-3,
@@ -375,6 +435,10 @@ def main():
                 predictions.append(part)
 
             print(f"Completed repeat {repeat + 1}, fold {fold}", flush=True)
+            # Checkpoints preserve completed folds if a later fit is interrupted.
+            pd.concat(predictions, ignore_index=True).to_csv(args.output / "oof_predictions.csv", index=False)
+            pd.DataFrame(tuning).to_csv(args.output / "inner_tuning.csv", index=False)
+            pd.DataFrame(diagnostics).to_csv(args.output / "training_diagnostics.csv", index=False)
 
     pred = pd.concat(predictions, ignore_index=True)
     pred.to_csv(args.output / "oof_predictions.csv", index=False)
@@ -414,9 +478,12 @@ def main():
     ].mean().to_csv(args.output / "centered_summary.csv")
 
     manifest["status"] = "complete"
+    manifest["completed_utc"] = datetime.now(timezone.utc).isoformat()
+    manifest["elapsed_seconds"] = time.monotonic() - started
     manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
     print(summary.sort_values("mean").round(5))
 
 
 if __name__ == "__main__":
-    main()
+    with threadpool_limits(limits=1):
+        main()

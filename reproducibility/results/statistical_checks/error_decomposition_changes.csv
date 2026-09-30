@@ -2,3 +2,5 @@ first_stage,second_stage,bias_squared_db2,centered_mse_db2,mse_db2
 i2em_fixed40_teacher,pretraining_only_surrogate,0.12223378827297893,0.027811886798958962,0.15004567507194366
 pretraining_only_surrogate,source_finetuned_surrogate,-26.282703307679178,2.551402645059448,-23.731300662619738
 source_finetuned_surrogate,risk_shrunk_surrogate,-1.2257592501581787,-1.893369294558707,-3.1191285447168866
+source_finetuned_surrogate,source_reset_adam_003,-0.8508363167028374,-1.2991547669302976,-2.1499910836331377
+pretraining_only_surrogate,source_reset_adam_003,-27.133539624382017,1.2522478781291504,-25.881291746252874

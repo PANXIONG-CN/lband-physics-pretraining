@@ -1784,6 +1784,62 @@ def plot_figs06(
 # 主程序
 # ============================================================
 
+
+def render_compact_revision(root: Path, output: Path) -> None:
+    """Render the two revised assets from the included compact result bundle."""
+    data = root / 'reproducibility/results'
+    output.mkdir(parents=True, exist_ok=True)
+    summary = pd.read_csv(data/'residual_baselines/summary.csv')
+    fig = plt.figure(figsize=(7.16, 3.6), layout='constrained')
+    ax = fig.add_subplot(111)
+    series = [('i2em_only', 'I$^2$EM-only neural', 'o', '-'),
+              ('spm_to_i2em', 'Sequential neural', 's', '-'),
+              ('spm_teacher', 'SPM (zero I$^2$EM labels)', None, '--'),
+              ('direct_rbf', 'Direct RBF', '^', ':'),
+              ('residual_ridge', 'Residual Ridge', 'D', '-.'),
+              ('residual_rbf', 'Residual RBF', 'v', '-')]
+    for method, label, marker, line in series:
+        curve = summary[summary.method.eq(method)].sort_values('size')
+        ax.errorbar(curve['size'], curve.rmse_mean_db, yerr=curve.rmse_std_db,
+                    label=label, marker=marker, linestyle=line, capsize=3, linewidth=1.3)
+    ax.set_xscale('log', base=2)
+    ax.set_yscale('log')
+    ax.set_xticks([32, 64, 128, 256], ['32', '64', '128', '256'])
+    ax.set_xlabel('Number of I$^2$EM training labels')
+    ax.set_ylabel('Mean HH/VV RMSE against I$^2$EM (dB)')
+    ax.tick_params(labelsize=9)
+    ax.legend(ncols=2, fontsize=8, loc='lower left')
+    ax.grid(axis='y', alpha=0.25)
+    fig.savefig(output/'fig03_sample_efficiency.pdf', bbox_inches='tight')
+    plt.close(fig)
+
+    table = pd.read_csv(data/'stage_diagnostics/stage_metrics.csv').set_index('method')
+    order = ['i2em_fixed40_teacher', 'pretraining_only_surrogate',
+             'source_finetuned_surrogate', 'source_reset_adam_003',
+             'pretraining_source_offset']
+    labels = [r'I$^2$EM teacher (40$^\circ$)', 'Pretraining only',
+              'Source fine-tuning (inherited Adam)', 'Source fine-tuning (reset Adam)',
+              'Pretraining + source intercept']
+    values = table.loc[order]
+    fig = plt.figure(figsize=(7.16, 3.0), layout='constrained')
+    ax = fig.add_subplot(111)
+    for j, method in enumerate(order):
+        row = values.loc[method]
+        point = row.centered_skill
+        ax.errorbar(point, j, xerr=[[point-row.centered_skill_ci_low],
+                                   [row.centered_skill_ci_high-point]],
+                    fmt='D' if method == 'pretraining_source_offset' else ('s' if method == 'source_reset_adam_003' else 'o'), capsize=3, markersize=6)
+    ax.axvline(0, linestyle='--', linewidth=0.9)
+    ax.set_yticks(range(len(order)), labels)
+    ax.invert_yaxis()
+    ax.set_xlabel('Centered differential skill (95% field-block interval)')
+    ax.tick_params(labelsize=9)
+    ax.set_xlim(-0.77, 0.29)
+    ax.grid(axis='x', alpha=0.25)
+    fig.savefig(output/'fig05_stage_retention.pdf', bbox_inches='tight')
+    plt.close(fig)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description=(
@@ -1801,7 +1857,12 @@ def main() -> None:
         type=Path,
         required=True,
     )
+    parser.add_argument("--compact-revision", action="store_true",
+                        help="Render the revised sample-efficiency and stage assets from reproducibility/")
     args = parser.parse_args()
+    if args.compact_revision:
+        render_compact_revision(args.project_root.resolve(), args.output_root.resolve())
+        return
 
     root = args.project_root
     base = (

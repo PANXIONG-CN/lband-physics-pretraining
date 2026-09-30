@@ -1,0 +1,26 @@
+{
+  "doi": "10.5067/X2EF9ZKL0DGC",
+  "collection_concept_id": "C3284167996-NSIDC_CPRD",
+  "product_version": "1",
+  "retrieved_utc": "2026-09-30T09:03:00.652636+00:00",
+  "files": [
+    {
+      "name": "SV12VA_Field_Sites_ver4_coords",
+      "url": "https://data.nsidc.earthdatacloud.nasa.gov/nsidc-cumulus-prod-protected/SMAP-VAL/SV12VA/1/2012/06/07/SV12VA_Field_Sites_ver4_coords",
+      "bytes": 29497,
+      "sha256": "d589d502d5e54044bbde4b905223a7d466e02a30df15f2a585ecec11bec43875"
+    },
+    {
+      "name": "SV12VA_Crop_Height_Diam_ver4.txt",
+      "url": "https://data.nsidc.earthdatacloud.nasa.gov/nsidc-cumulus-prod-protected/SMAP-VAL/SV12VA/1/2012/06/07/SV12VA_Crop_Height_Diam_ver4.txt",
+      "bytes": 102658,
+      "sha256": "1ee47d328f7f2e02a9fff5910149470e1147a29d1963da7bb3a78ad76a11df85"
+    },
+    {
+      "name": "SV12VA_Crop_Biomass_ver4.txt",
+      "url": "https://data.nsidc.earthdatacloud.nasa.gov/nsidc-cumulus-prod-protected/SMAP-VAL/SV12VA/1/2012/06/07/SV12VA_Crop_Biomass_ver4.txt",
+      "bytes": 83938,
+      "sha256": "9581caf4c222c2b54f3b23520f330b7b3de7e7a3282d0b53bd266edd644b6946"
+    }
+  ]
+}

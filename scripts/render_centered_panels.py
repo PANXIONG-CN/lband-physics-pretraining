@@ -23,7 +23,7 @@ def main() -> None:
     frame = pd.read_csv(a.bundle/'results/diagnostics/response_summary.csv')
     methods = [('scratch','Scratch'), ('spm_only','SPM'),
                ('spm_to_i2em',r'SPM $\to$ I$^2$EM'),
-               ('risk_spm_to_i2em','Risk-shrunk'), ('two_mean','Two-channel mean')]
+               ('risk_spm_to_i2em','Archived shrinkage'), ('two_mean','Two-channel mean')]
     specs = [('common','centered_skill','Common response: centered skill','figS02a_common_skill'),
              ('common','variance_ratio','Common response: variance ratio','figS02b_common_variance'),
              ('differential','centered_skill','Differential response: centered skill','figS02c_differential_skill'),

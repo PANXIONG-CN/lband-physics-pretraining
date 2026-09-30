@@ -1,0 +1,9 @@
+{
+  "original_script_vs_instrumented_gap8_oof": "identical",
+  "rows": 720,
+  "original_git_commit": "c05b2bcf3f08fbfceb5e9db338a4793cf2eed871",
+  "original_script": "scripts/review_source_structure.py",
+  "original_script_sha256": "7bcb396028d31495d236ef79146cbe7e5bb74de85964a457bd6482b65b019ae7",
+  "instrumented_script_sha256": "3c164b86d5876daa9ff6544e82f55eb8fac69dc23193897a83994e3ba87b2781",
+  "scope": "Unmodified original script and recorded replay, same matched gap-8 inputs and numerical environment"
+}

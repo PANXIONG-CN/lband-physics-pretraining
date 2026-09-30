@@ -1,0 +1,38 @@
+{
+  "source_input": {
+    "name": "smapvex12_portable_source.csv",
+    "sha256": "7b52a128dfbdd49c6270bc80203227cb63daa7f7e312a1f40a50c6ecbe15e785"
+  },
+  "vegetation_inputs": [
+    {
+      "name": "SV12VA_Crop_Biomass_ver4.txt",
+      "sha256": "9581caf4c222c2b54f3b23520f330b7b3de7e7a3282d0b53bd266edd644b6946"
+    },
+    {
+      "name": "SV12VA_Crop_Height_Diam_ver4.txt",
+      "sha256": "1ee47d328f7f2e02a9fff5910149470e1147a29d1963da7bb3a78ad76a11df85"
+    },
+    {
+      "name": "SV12VA_Field_Sites_ver4_coords",
+      "sha256": "d589d502d5e54044bbde4b905223a7d466e02a30df15f2a585ecec11bec43875"
+    }
+  ],
+  "script": {
+    "name": "review_match_vegetation.py",
+    "sha256": "6150b23e4cb3d1cd855baddad9410decfecaaca3a5a5e13b86b74b868f2cfd51"
+  },
+  "reader": {
+    "name": "vegetation.py",
+    "sha256": "a76716b35fb7761fd1f2adbf51e7bd49d687a7155d73883a567dfdac5b2f37d8"
+  },
+  "product_doi": "10.5067/X2EF9ZKL0DGC",
+  "source_rows": 240,
+  "matched_rows": 240,
+  "matched_fields": 24,
+  "matched_dates": 12,
+  "max_gap_days": 8,
+  "matched_fraction": 1.0,
+  "vwc_min_kg_m2": 0.011816666666666665,
+  "vwc_max_kg_m2": 13.55541,
+  "selection": "same field, nearest date, earlier date breaks ties"
+}

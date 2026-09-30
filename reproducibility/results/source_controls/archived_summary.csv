@@ -1,0 +1,11 @@
+control,method,mean_channel_rmse_db,std,common_skill,differential_skill
+source_structure,training_mean,3.189,0,0,0
+source_structure,fixed_common_scratch,3.214,0.016,0,-0.289
+source_structure,fixed_common_spm,3.205,0.001,0,-0.173
+source_structure,fixed_common_multifidelity,3.206,0.003,0,-0.188
+source_structure,components_scratch,3.379,0.212,-0.358,-0.289
+source_structure,components_multifidelity,3.34,0.07,-0.26,-0.188
+vegetation_gap2/fit,ridge,3.417,,,
+vegetation_gap2/fit,ridge_vwc,3.41,,,
+vegetation_gap8/fit,ridge,3.435,,,
+vegetation_gap8/fit,ridge_vwc,3.434,,,

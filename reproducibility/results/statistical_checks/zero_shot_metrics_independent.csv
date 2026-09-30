@@ -7,3 +7,6 @@ i2em_only,5.00645556171835
 spm_to_i2em,5.004098204335279
 risk_spm_to_i2em,4.981328058772875
 ridge_common_risk_spm_to_i2em,5.0233557001398195
+pretraining_only,5.523691296323026
+pretraining_source_offset,4.941184238612307
+source_reset_adam_003,4.992131780124803
