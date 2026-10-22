@@ -1,0 +1,67 @@
+{
+  "experiment": "E4_frozen_weights_target_two_intercepts",
+  "status": "FROZEN_BEFORE_CALIBRATION",
+  "post_hoc": true,
+  "script_sha256": "edea6a83b24c819c7a12afa2dc0ef25396d6f4a1a4bbdc2c4b32fabd83c9f123",
+  "inputs_sha256": {
+    "source": "7b52a128dfbdd49c6270bc80203227cb63daa7f7e312a1f40a50c6ecbe15e785",
+    "target": "e984a1cf6b39a35f28e3087b7f13f22e7aaf0de0a3a4b2e843b7dc00f44fb408",
+    "field_assignments": "3c6d85e80258bb640632f9a11c6be8f3467118c6013952632e1a2ace15154ab3",
+    "historical_metrics": "e530deb232f2e8e6b11637a7a74d9c127c2c57ee0fd0a6caaa8151e36e65b063",
+    "historical_summary": "6c3be3af8cf0aa8bb4cf46d2571beb5720a06a21984a152f0d0c3134c0058b31",
+    "frozen_zero_shot": "feaa015b477d4d8425f20d99e6a135496eda0dc4af1438dbd5d5a8cf2c3a00ac",
+    "member_1": "b062d816011b0ec903f8f3827240113cefefac487b27a147855a9f17abefd72b",
+    "member_2": "384b5339d75bb38d05bd4b8345f0ecfe8932da369a3aa668c6ee0776c2934f47",
+    "member_3": "c31c8b76dac4e23606c870086f8d319991760259749495b7e31177cfde7b2a56",
+    "member_4": "0b538fc6bd9c524da2b499902b5d580adae84425ac31b871e809ea81db3fa51e",
+    "member_5": "afc40dd4ee0c4d9e4b6b3626eccaa65eb1794e2c6a439c6638584fcc335e17ca"
+  },
+  "source": {
+    "rows": 240,
+    "fields": 24,
+    "role": "fixed source common response and historical weight training only"
+  },
+  "target": {
+    "rows": 189,
+    "fields": 30,
+    "task": "HH and VV backscatter, common response and VV-HH differential in dB"
+  },
+  "frozen_model_stages": [
+    "pretraining",
+    "source"
+  ],
+  "member_checkpoints": [
+    "rebuilt_member_1.npz",
+    "rebuilt_member_2.npz",
+    "rebuilt_member_3.npz",
+    "rebuilt_member_4.npz",
+    "rebuilt_member_5.npz"
+  ],
+  "adaptation": "For each checkpoint, fit two scalars using adaptation rows only: mean target common minus fixed source common, and mean observed differential minus frozen predicted differential. No gradient updates, source refit, or model selection.",
+  "aggregation": "Offsets are row-weighted means, matching the historical common-component adaptation rule; five member predictions are averaged.",
+  "field_split": "Reuse 20 archived repeats at 2, 3, and 6 whole adaptation fields; score all rows from untouched fields.",
+  "budgets_fields": [
+    2,
+    3,
+    6
+  ],
+  "metrics": [
+    "bias_db",
+    "rmse_db",
+    "centered_rmse_db",
+    "centered_skill"
+  ],
+  "historical_comparator": "Archived spm_to_i2em 30-epoch differential-head target fine-tuning with the same source start and a target common mean. Only per-split archived metrics are available.",
+  "comparison_rule": "Pair by split_repeat, fraction, and response; describe mean, median, range and proportion of split scores favoring two intercepts. Repeated splits overlap, so do not treat 20 repeats as independent tests.",
+  "frozen_zero_shot_check": "Numerically compare both no-target ensembles with existing 189-row frozen zero-shot predictions before estimating any target offsets.",
+  "target_test_rule": "Adaptation and test fields are disjoint in each split. Target test labels are used only for scoring after offsets are computed from adaptation rows.",
+  "date_scope": "Target dates may be shared between adaptation and test fields; this is a field-holdout result, not a new-date result.",
+  "historical_results_policy": "No old metric, checkpoint, source, target, or manuscript file is replaced.",
+  "output_directory": "D:\\research-pilots-tgrs-figures\\lband-physics-pretraining\\outputs\\review_E4_target_intercept",
+  "environment": {
+    "python": "3.14.6",
+    "platform": "Windows-11-10.0.22631-SP0",
+    "numpy": "2.5.1",
+    "pandas": "3.0.5"
+  }
+}

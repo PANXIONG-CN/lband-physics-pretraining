@@ -1,0 +1,70 @@
+{
+  "experiment": "E3_source_only_observational_differential_baselines",
+  "status": "FROZEN_BEFORE_FITTING",
+  "post_hoc": true,
+  "script_sha256": "8044e43c7dd677cd0886fc0fb9fb8a34af1445c9259ceb818f77720940888f84",
+  "inputs_sha256": {
+    "source": "7b52a128dfbdd49c6270bc80203227cb63daa7f7e312a1f40a50c6ecbe15e785",
+    "target": "e984a1cf6b39a35f28e3087b7f13f22e7aaf0de0a3a4b2e843b7dc00f44fb408",
+    "common_138": "8fbd01a5d1c69ea4785a8aa4862d9b6b34324f76903336a3302c6ade3d4358e9",
+    "e1_source_splits": "0ec5d5297a98ea6d8c51acdaba735d7546d9775a47fff0a757be7378c35c8841",
+    "e1_target_predictions": "46cc5a3301a0ede1cd614370dd839bd02ed0b05b582cccf9d6ccc723bcff656c",
+    "e1_manifest": "0388895ff1c764c84f9b142939e89fd4413c2380d5c1a7db3205c61a040fd371"
+  },
+  "target": "Observed VV-HH backscatter difference in dB, not a moisture retrieval or temporal change.",
+  "inference_inputs": [
+    "soil_moisture_m3_m3",
+    "soil_real_dielectric",
+    "pals_rms_height_cm",
+    "pals_correlation_length_cm"
+  ],
+  "feature_policy": "Topp dielectric computed from observed soil moisture on both campaigns; no response, date, field ID, or target label is an input feature.",
+  "baseline_candidates": [
+    "source_training_mean",
+    "ordinary_least_squares",
+    "ridge_alpha_0.1",
+    "ridge_alpha_1",
+    "ridge_alpha_10",
+    "ridge_alpha_100"
+  ],
+  "ridge_alphas": [
+    0.1,
+    1.0,
+    10.0,
+    100.0
+  ],
+  "model_selection": "Choose ridge alpha minimizing pooled source out-of-field RMSE; exact ties choose larger alpha. OLS and source mean are fixed, separately reported baselines.",
+  "scaling": "StandardScaler fitted on each source training fold only; final scaler fitted on 240 source records.",
+  "folds": "Exact four field-disjoint folds saved by E1, six validation fields each.",
+  "source_validation_sizes": [
+    62,
+    62,
+    60,
+    56
+  ],
+  "target_scoring": "After source-only ridge selection, fit on all 240 source rows and score 189 target rows and historical 138 common rows once. Compare to E1 frozen source-selected and original neural predictions on identical rows.",
+  "metrics": [
+    "bias_db",
+    "rmse_db",
+    "centered_rmse_db",
+    "centered_skill",
+    "correlation"
+  ],
+  "uncertainty": "5000 paired field bootstrap draws on each target cohort, seed 27261021; model fixed.",
+  "selection_uses_target_labels": false,
+  "no_experiment_changes": "No source data revision, target calibration, physical teacher retraining, or replacement of historical results.",
+  "environment": {
+    "python": "3.14.6",
+    "platform": "Windows-11-10.0.22631-SP0",
+    "numpy": "2.5.1",
+    "pandas": "3.0.5",
+    "scikit-learn": "1.9.0"
+  },
+  "limitations": [
+    "This forward task does not support a backscatter-change-to-moisture-change baseline.",
+    "The target campaign was examined previously; this is a post-hoc comparison.",
+    "The original fixed-incidence model and these baselines do not use target angle as an input.",
+    "Moisture is supplied at inference as in the original forward problem."
+  ],
+  "output_directory": "D:\\research-pilots-tgrs-figures\\lband-physics-pretraining\\outputs\\review_E3_source_baselines"
+}

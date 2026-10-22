@@ -1,0 +1,7 @@
+cohort,first,second,delta_skill_second_minus_first,ci_low,ci_high,bootstrap_iterations,bootstrap_seed
+all_source_240,spm_pretraining,sequential_pretraining,0.06506655331278277,-0.017261761426848536,0.16400429740687336,5000,27260910
+all_source_240,sequential_pretraining,source_inherited_in_sample,0.37555223516258807,0.11060720724178581,0.7083869850624542,5000,27260910
+all_source_240,sequential_pretraining,source_reset_in_sample,0.22710777091075418,0.051504259575234475,0.4845920943280229,5000,27260910
+spm_valid_186,spm_pretraining,sequential_pretraining,0.02347394294783034,-0.05342797237600383,0.10705163081975676,5000,27260910
+spm_valid_186,sequential_pretraining,source_inherited_in_sample,0.34648424385107657,0.06611887521598174,0.7014618433819386,5000,27260910
+spm_valid_186,sequential_pretraining,source_reset_in_sample,0.1977255269548378,0.026522215904738765,0.4401433478997089,5000,27260910

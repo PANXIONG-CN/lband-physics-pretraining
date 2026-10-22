@@ -1,0 +1,31 @@
+{
+  "status": "COMPLETE",
+  "experiment": "E4_frozen_weights_target_two_intercepts",
+  "source_rows": 240,
+  "source_fields": 24,
+  "target_rows": 189,
+  "target_fields": 30,
+  "field_split_count": 60,
+  "member_count": 5,
+  "adaptation_parameters_per_member": 2,
+  "model_weights_updated": false,
+  "target_test_labels_used_for_calibration": false,
+  "max_frozen_zero_shot_difference_db": {
+    "pretraining": 1.7763568394002505e-15,
+    "source": 7.105427357601002e-15
+  },
+  "historical_raw_predictions_available": false,
+  "post_hoc": true,
+  "elapsed_seconds": 3.6712232999998378,
+  "output_sha256": {
+    "fixed_member_predictions.csv": "35e8665e5a8e821d0f02895c68a0535730fe68741ae18eb3d22faa7c1d0d2790",
+    "heldout_predictions.csv": "5d29a437916643a7276bb8289e9b38e2d905fa4e13c463de6e526009b3b00d80",
+    "historical_comparison_by_split.csv": "27b1e3edacf262df15e5f90617d8da491f9ae629cdb56db349a9cabc21cd9ca0",
+    "historical_comparison_summary.csv": "613e5fe63be053a0661fa74ba4ec3cd08d75063fe32a4e0585ced3ed42e41e50",
+    "metrics_by_split.csv": "e0d1a3e5eb90beb56cc0a6146a90a1524c844680257393953f7a9ac1be6e7186",
+    "metrics_summary.csv": "5eb8d1a3f4ddfc3ef5cb3dc0ef67a97ccbd4c16e7d10dbc3933ecd0e894575aa",
+    "offsets_by_member.csv": "d105e73ec459c1834fd01c14dced81140472ed1dac6ec4100d0faac3523ccd69",
+    "protocol.json": "99c4386d01fe8757c5a9e55d602eb2a15ef7e9212089a5ceb69bc1e6d1f2cc07",
+    "split_integrity.csv": "c4403877d6a3be9b7e95e50e6ca7cf83bad9f3a22725728fbe2eaaebd5603b58"
+  }
+}

@@ -1,0 +1,4 @@
+cohort,scheme,draws,fewer_than_three_dates,zero_total_weight,min_dates,max_dates
+common_138,field,10000,0,0,6,7
+common_138,date,10000,22,0,2,7
+common_138,crossed,10000,30,0,2,7

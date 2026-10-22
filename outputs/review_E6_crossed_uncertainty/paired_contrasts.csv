@@ -1,0 +1,16 @@
+cohort,scheme,first,second,metric,role,estimate,low,high,valid_draws,undefined_draws,interpretation
+common_138,field,pretraining_source_intercept,frozen_pretraining_neural,rmse_db,primary,-3.3341978956477303,-3.540833229609669,-3.0849411584648494,10000,0,all_draws
+common_138,field,frozen_source_inherited_neural,frozen_pretraining_neural,centered_skill,primary,-0.6192088264381759,-0.8699313716709698,-0.3092810023565456,10000,0,all_draws
+common_138,field,frozen_source_reset_neural,frozen_pretraining_neural,centered_skill,primary,-0.3039124148152508,-0.4429263051191646,-0.11499331729186123,10000,0,all_draws
+common_138,field,E1_selected_neural,source_training_mean,rmse_db,primary,0.20392375330047052,-0.016195361870882906,0.41092337973084414,10000,0,all_draws
+common_138,field,source_selected_ridge,E1_selected_neural,centered_skill,exploratory,0.21435343397591944,0.0633141858899839,0.34323991181499597,10000,0,all_draws
+common_138,date,pretraining_source_intercept,frozen_pretraining_neural,rmse_db,primary,-3.3341978956477303,-3.3949030296531446,-3.2832834957233756,10000,0,all_draws
+common_138,date,frozen_source_inherited_neural,frozen_pretraining_neural,centered_skill,primary,-0.6192088264381759,-0.757875888099016,-0.4118712673635885,10000,0,all_draws
+common_138,date,frozen_source_reset_neural,frozen_pretraining_neural,centered_skill,primary,-0.3039124148152508,-0.3821511510639982,-0.19842454920327401,10000,0,all_draws
+common_138,date,E1_selected_neural,source_training_mean,rmse_db,primary,0.20392375330047052,0.15899773989256838,0.25240545172538464,10000,0,all_draws
+common_138,date,source_selected_ridge,E1_selected_neural,centered_skill,exploratory,0.21435343397591944,0.17138672686462408,0.24225211663884455,10000,0,all_draws
+common_138,crossed,pretraining_source_intercept,frozen_pretraining_neural,rmse_db,primary,-3.3341978956477303,-3.556963391437919,-3.0662402296812785,10000,0,all_draws
+common_138,crossed,frozen_source_inherited_neural,frozen_pretraining_neural,centered_skill,primary,-0.6192088264381759,-0.9366531117413589,-0.21285423929258168,10000,0,all_draws
+common_138,crossed,frozen_source_reset_neural,frozen_pretraining_neural,centered_skill,primary,-0.3039124148152508,-0.47562462887020585,-0.07460077848086061,10000,0,all_draws
+common_138,crossed,E1_selected_neural,source_training_mean,rmse_db,primary,0.20392375330047052,-0.025514135836533645,0.4190834137450379,10000,0,all_draws
+common_138,crossed,source_selected_ridge,E1_selected_neural,centered_skill,exploratory,0.21435343397591944,0.05356896786860734,0.35684030110694254,10000,0,all_draws

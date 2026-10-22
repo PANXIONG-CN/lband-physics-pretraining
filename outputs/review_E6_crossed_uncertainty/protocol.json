@@ -1,0 +1,63 @@
+{
+  "experiment": "E6",
+  "status": "FROZEN_BEFORE_EXECUTION",
+  "post_hoc": true,
+  "script_sha256": "a8f7668cd4e0b4f661e07199fdbc3bb34f27da09c6eddc2b58b2f01f196252d4",
+  "inputs": {
+    "target": "D:\\research-pilots-tgrs-figures\\lband-physics-pretraining\\reproducibility\\data\\target\\smex02_field_day_model_ready.csv",
+    "stage": "D:\\research-pilots-tgrs-figures\\lband-physics-pretraining\\reproducibility\\results\\stage_diagnostics\\stage_predictions.csv",
+    "E3_target": "D:\\research-pilots-tgrs-figures\\lband-physics-pretraining\\outputs\\review_E3_source_baselines\\target_predictions.csv"
+  },
+  "inputs_sha256": {
+    "target": "e984a1cf6b39a35f28e3087b7f13f22e7aaf0de0a3a4b2e843b7dc00f44fb408",
+    "stage": "8fbd01a5d1c69ea4785a8aa4862d9b6b34324f76903336a3302c6ade3d4358e9",
+    "E3_target": "eebfcd714b3f1223510013532bd55e4195cd0a38ebb3a46e2881af90c6abf944"
+  },
+  "seed": 20261020,
+  "draws": 10000,
+  "response": "VV-HH in dB; supplied soil moisture is an inference input, not a retrieval target",
+  "E5_specification": "OLS with intercept d=a+b*moisture; exact saved four source-field folds; no hyperparameter search. Final fit uses all 240 source rows. Target 138 and 189 cohorts separately. Other methods loaded unchanged. Only differential metrics; no HH/VV model ranking.",
+  "E6_specification": "Common 138 records/22 fields/7 dates only; saved models and offsets fixed. Field, date, and crossed product weights. Each mode restarts RNG seed; crossed mode samples fields first then dates. Weighted overall and field means recomputed per draw. Missing cells remain missing.",
+  "E6_primary_contrasts": [
+    [
+      "pretraining_source_intercept",
+      "frozen_pretraining_neural",
+      "rmse_db"
+    ],
+    [
+      "frozen_source_inherited_neural",
+      "frozen_pretraining_neural",
+      "centered_skill"
+    ],
+    [
+      "frozen_source_reset_neural",
+      "frozen_pretraining_neural",
+      "centered_skill"
+    ],
+    [
+      "E1_selected_neural",
+      "source_training_mean",
+      "rmse_db"
+    ]
+  ],
+  "E5_contrasts": "Moisture-only OLS minus every saved comparator, RMSE and centered skill; exploratory, unadjusted paired field percentiles.",
+  "metrics": [
+    "bias_db",
+    "rmse_db",
+    "centered_mse_db2",
+    "centered_skill",
+    "correlation",
+    "within_skill",
+    "between_skill",
+    "observed_variance_db2",
+    "within_observed_variance_db2"
+  ],
+  "undefined_rule": "Denominators <=1e-12 yield NaN. Keep all draws, report counts; percentiles on finite values explicitly conditional if any undefined. Fewer than 3 represented dates flagged, retained. Zero observed variance is not replaced by zero skill.",
+  "scope": "Post-hoc sensitivity, not independent confirmation. Seven dates are not a reliable sample of all future dates. Bootstrap conditions on trained models, fixed offsets, source selection and observed missingness. Date exchangeability/independence is unverified. No E4 historical record-level inference.",
+  "environment": {
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "pandas": "3.0.1",
+    "platform": "Windows-11-10.0.22631-SP0"
+  }
+}

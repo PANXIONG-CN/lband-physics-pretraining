@@ -1,0 +1,29 @@
+{
+  "status": "COMPLETE",
+  "experiment": "E3_source_only_observational_differential_baselines",
+  "source_only_selected_ridge": {
+    "selected_ridge": "ridge_alpha_100",
+    "alpha": 100.0,
+    "source_oof_rmse_db": 1.8807448838632836,
+    "source_oof_centered_skill": -0.06836523510463488,
+    "target_labels_opened_for_selection": false
+  },
+  "source_rows": 240,
+  "source_fields": 24,
+  "target_rows": 189,
+  "target_fields": 30,
+  "target_labels_used_for_selection": false,
+  "post_hoc": true,
+  "elapsed_seconds": 0.45106550000036805,
+  "output_sha256": {
+    "protocol.json": "672635fc339bdac8a96fbb9e7c2aac472f95f40e62393c963e305523ced2bc87",
+    "source_cv_metrics.csv": "927a4359696f1008b2281fd6165321f0a96db6109977ee477fad1b83821b0877",
+    "source_cv_predictions.csv": "c22fc726c686367a6176f93a466e466bd3dfe3880ed61e4e6921d31f603ef1df",
+    "source_fold_metrics.csv": "bbe04b1db15967d8a82446e65195993658c1a189b8058cde33d970f9cc3fe419",
+    "source_selection.json": "e29e1e120a63ad786c22ba1672bf90c7324a8e8bb03589d492ee09e691d6d28d",
+    "source_splits.csv": "0ec5d5297a98ea6d8c51acdaba735d7546d9775a47fff0a757be7378c35c8841",
+    "target_metrics.csv": "bb291aab85218c80683f802953f292fb94956b4263d39d5109f198c41afebcc6",
+    "target_paired_contrasts.csv": "7db069ff2bbd95f3e3643608bac1af61a1daa47826ce19a0fe1914759d56d2c5",
+    "target_predictions.csv": "eebfcd714b3f1223510013532bd55e4195cd0a38ebb3a46e2881af90c6abf944"
+  }
+}

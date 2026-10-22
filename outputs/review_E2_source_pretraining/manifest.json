@@ -1,0 +1,48 @@
+{
+  "status": "COMPLETE",
+  "analysis_role": "Approved E2 source-domain forward evaluation; no training or selection",
+  "input_paths": {
+    "source": "D:\\research-pilots-tgrs-figures\\lband-physics-pretraining\\reproducibility\\data\\source\\smapvex12_portable_source.csv",
+    "member_1": "D:\\research-pilots-tgrs-figures\\lband-physics-pretraining\\reproducibility\\results\\trajectory_reconstruction\\rebuilt_member_1.npz",
+    "member_2": "D:\\research-pilots-tgrs-figures\\lband-physics-pretraining\\reproducibility\\results\\trajectory_reconstruction\\rebuilt_member_2.npz",
+    "member_3": "D:\\research-pilots-tgrs-figures\\lband-physics-pretraining\\reproducibility\\results\\trajectory_reconstruction\\rebuilt_member_3.npz",
+    "member_4": "D:\\research-pilots-tgrs-figures\\lband-physics-pretraining\\reproducibility\\results\\trajectory_reconstruction\\rebuilt_member_4.npz",
+    "member_5": "D:\\research-pilots-tgrs-figures\\lband-physics-pretraining\\reproducibility\\results\\trajectory_reconstruction\\rebuilt_member_5.npz"
+  },
+  "input_sha256": {
+    "source": "7b52a128dfbdd49c6270bc80203227cb63daa7f7e312a1f40a50c6ecbe15e785",
+    "member_1": "b062d816011b0ec903f8f3827240113cefefac487b27a147855a9f17abefd72b",
+    "member_2": "384b5339d75bb38d05bd4b8345f0ecfe8932da369a3aa668c6ee0776c2934f47",
+    "member_3": "c31c8b76dac4e23606c870086f8d319991760259749495b7e31177cfde7b2a56",
+    "member_4": "0b538fc6bd9c524da2b499902b5d580adae84425ac31b871e809ea81db3fa51e",
+    "member_5": "afc40dd4ee0c4d9e4b6b3626eccaa65eb1794e2c6a439c6638584fcc335e17ca"
+  },
+  "script_sha256": "56f777adb6ef5000a28424213905c9f7cbc6d049bded7dfdf02ddefb7aa4dce8",
+  "environment": {
+    "python": "3.14.6",
+    "numpy": "2.5.1",
+    "platform": "Windows-11-10.0.22631-SP0"
+  },
+  "source_records": 240,
+  "source_fields": 24,
+  "spm_valid_records": 186,
+  "spm_valid_fields": 19,
+  "feature_rule": "Topp dielectric recomputed from soil moisture; original NPZ scales fixed",
+  "output_rule": "Differential VV minus HH in dB",
+  "stages": {
+    "spm_pretraining": "spm",
+    "sequential_pretraining": "pretraining",
+    "source_inherited_in_sample": "source",
+    "source_reset_in_sample": "source_reset_adam_003"
+  },
+  "source_intercept_reference_check_db": -3.807911088607191,
+  "selection": "None; all model weights and evaluation cohorts fixed",
+  "source_trained_stage_caveat": "Source-trained endpoints are scored in sample; they are not source held-out validation estimates",
+  "bootstrap": {
+    "unit": "field_id",
+    "iterations": 5000,
+    "seed": 27260910,
+    "conditional_on": "saved weights and observed source dates"
+  },
+  "target_labels_used": false
+}

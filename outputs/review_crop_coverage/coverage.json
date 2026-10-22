@@ -1,0 +1,103 @@
+{
+  "input_files": {
+    "D:\\research-pilots-tgrs-figures\\smex02_wc_site.txt": "8675C65BFD9C5E522B6B4209972677ADB1061AAF5E420E64D39374D628E427F5",
+    "D:\\research-pilots-tgrs-figures\\lband-physics-pretraining\\reproducibility\\data\\target\\smex02_field_day_model_ready.csv": "E984A1CF6B39A35F28E3087B7F13F22E7AAF0DE0A3A4B2E843B7DC00F44FB408",
+    "D:\\research-pilots-tgrs-figures\\lband-physics-pretraining\\reproducibility\\results\\common_cohort\\predictions.csv": "0D07DA4A3C7BC4CBCE4C90BE24B77F95BF802C82DFC9EBDA355CE734C899BD96"
+  },
+  "site_rows": 94,
+  "site_fields": 31,
+  "parse_problem_lines": [],
+  "location_counts": {
+    "3": 30,
+    "4": 1
+  },
+  "crop_vocabulary": [
+    "corn",
+    "soy",
+    "soy-flexcoil"
+  ],
+  "all_site_fields_have_consistent_raw_crop": true,
+  "target": {
+    "records": 189,
+    "fields": 30,
+    "records_with_site_id": 189,
+    "records_with_consistent_crop": 189,
+    "fields_with_site_id": 30,
+    "fields_with_defined_crop": 30,
+    "fields_with_consistent_crop": 30,
+    "missing_site_ids": [],
+    "ambiguous_crop_ids": []
+  },
+  "common": {
+    "records": 138,
+    "fields": 22,
+    "records_with_site_id": 138,
+    "records_with_consistent_crop": 138,
+    "fields_with_site_id": 22,
+    "fields_with_defined_crop": 22,
+    "fields_with_consistent_crop": 22,
+    "missing_site_ids": [],
+    "ambiguous_crop_ids": []
+  },
+  "excluded": {
+    "records": 51,
+    "fields": 8,
+    "records_with_site_id": 51,
+    "records_with_consistent_crop": 51,
+    "fields_with_site_id": 8,
+    "fields_with_defined_crop": 8,
+    "fields_with_consistent_crop": 8,
+    "missing_site_ids": [],
+    "ambiguous_crop_ids": []
+  },
+  "site_ids_not_used_in_target": [
+    "WC12"
+  ],
+  "coordinate_check": {
+    "method": "WGS84 UTM zone 15N inverse plus nearest of listed site locations",
+    "max_of_field_maximum_nearest_location_distance_m": 640.2212725599284,
+    "fields_over_500m": [
+      "WC11",
+      "WC20"
+    ],
+    "fields_over_1000m": [],
+    "field_max_nearest_location_distance_m": {
+      "WC01": 348.0,
+      "WC03": 283.7,
+      "WC04": 456.1,
+      "WC05": 134.6,
+      "WC06": 282.7,
+      "WC08": 232.7,
+      "WC09": 183.1,
+      "WC10": 390.4,
+      "WC11": 640.2,
+      "WC13": 363.4,
+      "WC14": 156.4,
+      "WC15": 223.4,
+      "WC16": 250.3,
+      "WC17": 306.7,
+      "WC18": 310.2,
+      "WC19": 480.8,
+      "WC20": 512.6,
+      "WC21": 149.1,
+      "WC22": 428.4,
+      "WC23": 190.8,
+      "WC24": 108.9,
+      "WC25": 96.9,
+      "WC26": 280.0,
+      "WC27": 330.3,
+      "WC28": 338.1,
+      "WC29": 395.3,
+      "WC30": 325.6,
+      "WC31": 383.8,
+      "WC32": 424.5,
+      "WC33": 419.4
+    },
+    "qualification": "Approximate spatial identity check, not a proof that vegetation sampling locations equal the radar footprint or represent all field vegetation."
+  },
+  "limits": [
+    "Supplied file provenance was not independently authenticated by NSIDC checksum.",
+    "Site table contains static crop labels only; no date-specific vegetation response was matched.",
+    "No retained-versus-excluded crop distribution or error attribution is computed here."
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "data_sha256": {
+    "site": "8675C65BFD9C5E522B6B4209972677ADB1061AAF5E420E64D39374D628E427F5",
+    "target": "E984A1CF6B39A35F28E3087B7F13F22E7AAF0DE0A3A4B2E843B7DC00F44FB408",
+    "common": "0D07DA4A3C7BC4CBCE4C90BE24B77F95BF802C82DFC9EBDA355CE734C899BD96"
+  },
+  "site_rows": 94,
+  "site_identifiers": 31,
+  "duplicate_target_field_dates": 0,
+  "duplicate_common_field_dates": 0,
+  "common_equals_both_screened": true,
+  "all_excluded_fail_spm_ks": true,
+  "all_target_pass_i2em": true,
+  "cohorts": {
+    "complete": {
+      "fields": 30,
+      "records": 189,
+      "field_labels": {
+        "soy": 8,
+        "corn": 20,
+        "soy-flexcoil": 2
+      },
+      "record_labels": {
+        "corn": 125,
+        "soy": 51,
+        "soy-flexcoil": 13
+      }
+    },
+    "common_valid": {
+      "fields": 22,
+      "records": 138,
+      "field_labels": {
+        "soy": 8,
+        "corn": 12,
+        "soy-flexcoil": 2
+      },
+      "record_labels": {
+        "soy": 51,
+        "corn": 74,
+        "soy-flexcoil": 13
+      }
+    },
+    "excluded": {
+      "fields": 8,
+      "records": 51,
+      "field_labels": {
+        "corn": 8
+      },
+      "record_labels": {
+        "corn": 51
+      }
+    }
+  },
+  "excluded_record_percent": 26.984127,
+  "excluded_field_percent": 26.666667,
+  "baseline_sha256": {
+    "main.tex": "A5A6539EFB07A62A9BC5E4AEFC50CCA2FCB09B73BAA40F2E751A9CFB7263153F",
+    "supplement.tex": "448C2A4F94FD5E59D77BBC6FD278C9963A4F3B9FB41EFEE58CD6C436015CDEEB",
+    "references.bib": "0E1818397BA5985E01E65872EDBE3106938992FE028274D859513A2E26BB562B"
+  }
+}

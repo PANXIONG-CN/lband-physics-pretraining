@@ -1,7 +1,8 @@
 # L-band scattering: bias calibration and differential-response diagnostics
 
-Companion code and processed data for *Bias Calibration and Differential-Response
-Loss in Cross-Campaign Transfer of L-Band Scattering Surrogates*, version **0.2.5**.
+Companion code and processed data for *Bias Calibration and Centered Differential
+Skill in L-Band Surrogate Transfer from SMAPVEX12 to SMEX02*. The software package
+version remains **0.2.5**; the local manuscript revision below is not a new release.
 The internal Python package is `research_pilots`. The fixed release and download
 are available at [v0.2.5](https://github.com/PANXIONG-CN/lband-physics-pretraining/releases/tag/v0.2.5).
 
@@ -11,7 +12,69 @@ remains 0.2.5. The fixed v0.2.5 tag, Release and download retain their earlier
 contents; use `main` for this submission update. Frozen data, statistical
 results and model weights are unchanged.
 
-## Recalculate the paper results
+## Local manuscript revision imported on 2026-10-22
+
+This working copy includes the accepted revision from
+`lband-physics-pretraining_manuscript_20261021_192831.zip`: the post hoc E1-E6
+controls, target crop metadata and accounting, and the reviewed figure script.
+These additions are not part of the public v0.2.5 tag, Release or download.
+The original frozen predictions and weights are retained. The existing
+`matched_information/protocol.json` only receives the archive's correction of
+the path to `offset_diagnostics/risk_selected_weights.csv`.
+
+| Control | Script under `scripts/` | Frozen evidence under `outputs/` |
+| --- | --- | --- |
+| E1: source-only optimizer/rate/epoch selection | `evaluate_source_optimization_controls.py` | `review_E1_source_optimization/` |
+| E2: source observations before updating | `evaluate_source_pretraining_skill.py` | `review_E2_source_pretraining/` |
+| E3: source mean, OLS and Ridge baselines | `evaluate_source_differential_baselines.py` | `review_E3_source_baselines/` |
+| E4: frozen-weight target-intercept calibration | `evaluate_target_intercept_control.py` | `review_E4_target_intercept/` |
+| E5: moisture-only regression | `evaluate_review_E5_E6.py` | `review_E5_moisture_baseline/` |
+| E6: field/date resampling sensitivity | `evaluate_review_E5_E6.py` | `review_E6_crossed_uncertainty/` |
+
+The supplied site table is `data/target_metadata/smex02_wc_site.txt`. Coverage
+and crop-accounting records are in `outputs/review_crop_coverage/` and
+`outputs/review_crop_composition/`. These static labels describe cohort
+composition; they do not establish vegetation effects or crop-conditioned
+prediction error. The site file was supplied with the revision; its provenance
+was not independently authenticated by an official byte-level checksum.
+`outputs/E5_E6_results.md` and `outputs/E5_E6_verification.json` are supplied
+historical records, not checks performed during this import. Git ignore
+exceptions expose only the 76 supplied evidence files in these locations;
+other generated outputs remain ignored.
+
+The controls support a diagnosis of this SMAPVEX12-to-SMEX02 workflow, not a
+general predictive advantage of physics pretraining. Source-only fitting does
+not make controls designed after target inspection independent confirmation.
+The revised manuscript retains zero-spanning intervals and the limits of E4's
+historical comparison. L2-SP, Oh/Dubois baselines, target vegetation/error
+controls and a measurement-noise ceiling remain outside this revision.
+
+The historical E1/E3 protocols record Windows 11, Python 3.14.6, NumPy 2.5.1
+and scikit-learn 1.9.0; E2/E4 record the same Python and NumPy versions.
+E5/E6 record Windows 11, Python 3.12.14, NumPy 2.3.5 and pandas 3.0.1.
+Full environment records remain in each experiment's protocol or manifest.
+These records are separate from the original reproduction environment below.
+`pyproject.toml` still supports Python 3.11-3.13, and
+`requirements-reproducibility.txt` is unchanged; no compatibility or numerical
+reproduction claim for E1-E6 is made by this import.
+
+The revised TeX, supplied PDFs and placed figures live in the sibling
+`../manuscript/` directory. All four referenced `candidate` figure filenames
+and the older assets are retained. `scripts/render_reviewed_figures.py` is
+included as supplied; no renderer was run. The existing
+`reproducibility/figures/` assets are retained separately and were not synchronized
+to the revised manuscript. The renderer commands below describe the earlier
+figure set, not a replacement procedure for the new placed figures.
+
+`RELEASE_CANDIDATE_NOTE.md` describes the archive's final crop-composition round,
+not the complete difference from the September checkout.
+`ARCHIVE_MANIFEST.sha256` is preserved as a record of the original two-directory
+archive, including its sibling manuscript paths. It is not a checksum manifest
+for this edited working tree: this README and `.gitignore` have local import
+documentation changes. No compilation, PDF page review, tests, metric
+recalculation or experiment reruns were performed during the import.
+
+## Recalculate the original v0.2.5 results
 
 Run from the repository root using Python 3.11–3.13. The following commands use
 included tables, saved weights and predictions; they perform no model training.
@@ -99,8 +162,10 @@ smaller than the historical 0.10 dB practical criterion.
 
 Between-field differences explain 80.13% of observed differential variance.
 Pretraining within-field skill is **0.018155**, with a field-bootstrap interval
-**[−0.181655, 0.189509]**. Within-field skill remains negative after either source
-update. Deleting each observation date and giving fields equal total weight
+**[−0.181655, 0.189509]**. Within-field point estimates after both source updates
+are negative. Their original fixed-date field intervals are below zero, while
+the later E6 joint field-and-date interval for reset Adam is **[−0.271, 0.007]**
+and crosses zero. Deleting each observation date and giving fields equal total weight
 preserve positive overall pretraining skill and negative skill after both source
 updates. These post-hoc calculations fix predictions, observed dates and source
 calibration; they do not estimate uncertainty over new training or adaptation.
@@ -192,6 +257,7 @@ Cite the original Version 1 NASA NSIDC DAAC products:
 | SMEX02 | PALS data, NSIDC-0183 | [10.5067/D7IROA0Q6JEQ](https://doi.org/10.5067/D7IROA0Q6JEQ) |
 | SMEX02 | Walnut Creek soil moisture, NSIDC-0143 | [10.5067/OAO4SU0XZLGR](https://doi.org/10.5067/OAO4SU0XZLGR) |
 | SMEX02 | Geolocation, roughness and photographs, NSIDC-0204 | [10.5067/R9AA6FC58HES](https://doi.org/10.5067/R9AA6FC58HES) |
+| SMEX02 | Watershed vegetation sampling, static WC site metadata, NSIDC-0187 | [10.5067/XCGVUPGKER17](https://doi.org/10.5067/XCGVUPGKER17) |
 
 Use explicit local paths with `inspect_smapvex.py`, `collocate_smapvex_ground.py`
 and `prepare_smex02_external.py`. Source matching uses same-day field centers;

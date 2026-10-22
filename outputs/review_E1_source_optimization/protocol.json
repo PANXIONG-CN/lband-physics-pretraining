@@ -1,0 +1,100 @@
+{
+  "experiment": "E1_same_initialization_source_optimization",
+  "status": "FROZEN_BEFORE_TRAINING",
+  "post_hoc": true,
+  "main_result_policy": "Existing frozen manuscript results are not replaced.",
+  "script_sha256": "666dfa4927c457c15a24988fe1217cbec60d725035ea6c528d89d3f893359be6",
+  "inputs_sha256": {
+    "source": "7b52a128dfbdd49c6270bc80203227cb63daa7f7e312a1f40a50c6ecbe15e785",
+    "target": "e984a1cf6b39a35f28e3087b7f13f22e7aaf0de0a3a4b2e843b7dc00f44fb408",
+    "spm": "2c8f6ffd86a6be9358d3838336513060e184f813757278a1ba579a0dfedc3657",
+    "i2em_requests": "15d39664f59f64f6c75feb1574589fd76892848f5e8c57e58bfadaf0d87fad5b",
+    "i2em_results": "f5d1a666ba563d0ab05c79c59c00fbe495dd285dcc4b792c6b409a241f5e219b",
+    "common_138": "8fbd01a5d1c69ea4785a8aa4862d9b6b34324f76903336a3302c6ade3d4358e9",
+    "member_1": "b062d816011b0ec903f8f3827240113cefefac487b27a147855a9f17abefd72b",
+    "member_2": "384b5339d75bb38d05bd4b8345f0ecfe8932da369a3aa668c6ee0776c2934f47",
+    "member_3": "c31c8b76dac4e23606c870086f8d319991760259749495b7e31177cfde7b2a56",
+    "member_4": "0b538fc6bd9c524da2b499902b5d580adae84425ac31b871e809ea81db3fa51e",
+    "member_5": "afc40dd4ee0c4d9e4b6b3626eccaa65eb1794e2c6a439c6638584fcc335e17ca"
+  },
+  "source": {
+    "rows": 240,
+    "fields": 24,
+    "partition": "four-fold GroupKFold by field_id",
+    "validation_rows_per_fold": [
+      62,
+      62,
+      60,
+      56
+    ],
+    "validation_fields_per_fold": [
+      6,
+      6,
+      6,
+      6
+    ]
+  },
+  "starting_checkpoint": "Five rebuilt_member_1..5.npz pretraining arrays; reconstructed Adam state must match each checkpoint within 1e-10.",
+  "reconstruction": "SPM 200 epochs followed by I2EM 100 epochs with seeds 20260910 + 100000*j, j=0..4; original fixed scalers.",
+  "architecture": [
+    4,
+    16,
+    8,
+    1
+  ],
+  "activation": "tanh",
+  "loss": "scikit-learn MLPRegressor squared error with alpha=0.001, trained on original standardized differential VV-HH",
+  "optimizer": "Adam beta_1=0.9 beta_2=0.999 epsilon=1e-8; inherited versus zero moments and clock; both model and optimizer effective learning rates set to candidate value.",
+  "learning_rates": [
+    0.001,
+    0.003
+  ],
+  "optimizer_states": [
+    "inherited",
+    "reset"
+  ],
+  "epochs": [
+    30,
+    60,
+    120
+  ],
+  "checkpoint_rule": "One continuous 120-epoch training path per fold, member, state, rate; record epochs 30/60/120.",
+  "source_training_order_seed": "member seed + 10102, restarted identically for all arms and folds.",
+  "randomness": {
+    "member_seeds": [
+      20260910,
+      20360910,
+      20460910,
+      20560910,
+      20660910
+    ],
+    "cv_folds": 4,
+    "threads": 1,
+    "bootstrap_seed": 27261020
+  },
+  "selection": "Minimum pooled out-of-field source validation RMSE (dB) of five-member ensemble across 12 candidates. Exact ties: fewer epochs, lower learning rate, inherited before reset.",
+  "target": "Read target observations only after source selection. Score selected full-source refit once on full 189 and historical common 138 cohorts; compare frozen pretraining/inherited/reset weights. No target-based selection.",
+  "metrics": [
+    "bias_db",
+    "rmse_db",
+    "centered_rmse_db",
+    "centered_skill",
+    "correlation"
+  ],
+  "uncertainty": "Fixed-model field bootstrap on target at 5000 draws; post-selection source uncertainty is descriptive.",
+  "output_directory": "D:\\research-pilots-tgrs-figures\\lband-physics-pretraining\\outputs\\review_E1_source_optimization",
+  "environment": {
+    "python": "3.14.6",
+    "platform": "Windows-11-10.0.22631-SP0",
+    "numpy": "2.5.1",
+    "scipy": "1.18.0",
+    "pandas": "3.0.5",
+    "scikit-learn": "1.9.0",
+    "threadpoolctl": "3.6.0"
+  },
+  "limitations": [
+    "Exploratory post-hoc control; target cohort was used in earlier project work.",
+    "Source simulation range was informed by source covariates.",
+    "Only five initialization seeds and four source field folds."
+  ]
+}

@@ -1,0 +1,20 @@
+[
+  {
+    "experiment": "review_E5_moisture_baseline",
+    "hashes": "PASS",
+    "output_count_excluding_manifest": 15
+  },
+  {
+    "experiment": "review_E6_crossed_uncertainty",
+    "hashes": "PASS",
+    "output_count_excluding_manifest": 15
+  },
+  {
+    "direct_expanded_draw_metric_checks": 144,
+    "result": "PASS"
+  },
+  {
+    "previous_E1_E4_files_unchanged": 40,
+    "result": "PASS"
+  }
+]

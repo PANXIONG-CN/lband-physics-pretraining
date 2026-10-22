@@ -1,0 +1,33 @@
+{
+  "status": "COMPLETE",
+  "experiment": "E1_same_initialization_source_optimization",
+  "selected_source_only": {
+    "optimizer_state": "inherited",
+    "effective_learning_rate": 0.003,
+    "epochs": 30,
+    "source_oof_rmse_db": 1.8875480663430282,
+    "source_oof_centered_skill": -0.0585458202369471
+  },
+  "max_pretraining_checkpoint_difference": 4.884981308350689e-15,
+  "source_oof_rows": 240,
+  "source_oof_fields": 24,
+  "target_rows": 189,
+  "target_fields": 30,
+  "target_labels_used_for_selection": false,
+  "source_final_fit_is_in_sample": true,
+  "post_hoc": true,
+  "elapsed_seconds": 35.95518179999999,
+  "outputs_sha256": {
+    "protocol.json": "4bb58badf6d4df07ea130ec3c14b941fa76a40b2d7b45a151a21e01a20e27e35",
+    "selected_full_source_learning_curves.csv": "7fa8e369e7656a3949e48a04867872efbab540c40757d647a3e3b8ef2fa73994",
+    "selected_full_source_predictions.csv": "b1c5c02a13a753211cfd0ff325954a3841b37807fab41612f78e3bfd8db47309",
+    "source_learning_curves.csv": "2ef5c65a7a2c31cd2f2e8fa91c624c97ab8803f7519ce823fade5c2740f91a22",
+    "source_selection.json": "03ef258a102c26bd1f69dc0db67387b3e365f3d36cc39f17c5331a009e95de34",
+    "source_splits.csv": "0ec5d5297a98ea6d8c51acdaba735d7546d9775a47fff0a757be7378c35c8841",
+    "source_validation_metrics.csv": "83aa9dc22b692d6d5a546644072cb9289cd3f27b6013be95afeb1a589da378e8",
+    "source_validation_predictions.csv": "1d9031c5b04fd3791ec03d436a835b0512f8f6bbb34886e89c3cbf5e4b8d4908",
+    "target_ensemble_predictions.csv": "46cc5a3301a0ede1cd614370dd839bd02ed0b05b582cccf9d6ccc723bcff656c",
+    "target_metrics.csv": "404846b4762dd026bfae9986b54485808d9237951c44cddbe009e5f895a68b67",
+    "target_predictions_by_member.csv": "853ecced84cf65b0cd25c2511841bc7f107d20e560fb1c5ab0be199035612bfe"
+  }
+}

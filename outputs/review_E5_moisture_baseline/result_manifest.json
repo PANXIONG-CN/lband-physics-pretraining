@@ -1,0 +1,28 @@
+{
+  "weighted_metrics_explicit_replication_test": "PASS",
+  "offset_skill_invariance": "PASS",
+  "status": "COMPLETE",
+  "experiment": "E5",
+  "post_hoc": true,
+  "source_intercept_reused_db": -3.8079110886071916,
+  "model_training": true,
+  "manuscript_modified": false,
+  "inputs_unchanged": true,
+  "output_sha256": {
+    "analysis_predictions.csv": "1803bc2791ef6bf8605757cafdcb623fcd2544944e11778f44cd4479e26e3e04",
+    "coefficients.csv": "1980a19b56f094f1d111f1bf784def9caace73ae75b45db27995f34d7896a98d",
+    "common_138_field_bootstrap_metrics.csv.gz": "29dd13b2a58be2d5fc82a6377960a41f42eb974e0bd01b66bf58c3d31ef7165d",
+    "common_138_field_draw_audit.csv": "6a0724400a16d34e203edff447f35debf81ce067fb6908bb0cefe90d0e0ec70c",
+    "common_138_field_resampling.npz": "eb57a6c6a8338a8e8d2468cc150d0d9e9bf205227e5ba6029e5a942a5946d0fa",
+    "field_date_coverage.csv": "7b7f99febb5bb808bb654952d3613faf73bf058385b0926e17871d46b311ce0b",
+    "full_189_field_bootstrap_metrics.csv.gz": "4558236e1bd7f1463cfc098110ec350d4be46298a8f01ca4239c4632059faee4",
+    "full_189_field_draw_audit.csv": "71138f4048a4ad24cf1742feea9fae48c20bdbfcfdfa431273e3ac33f1e3711d",
+    "full_189_field_resampling.npz": "206ed18e960e833d8481458fce46cc5f1b39dac4ad152ff4076a37a8a7e9271b",
+    "metric_intervals.csv": "f98bb596fa55af43de2f90d9491b9f93bc6c7bfbd5e8bc6ad4255550df4e5248",
+    "paired_contrasts.csv": "3d003a8994a8ccbe9f6ae26036a8aec2a534df8a92a0affa60f26cd010f1d32a",
+    "protocol.json": "22e9f6d73d93c7015278571a327db0c01f0e8db365b560fee0ab91b84a66a8b6",
+    "resampling_summary.csv": "85df7a86dd46fce59dc6196de2ecbf7435cb2e6d29dabb44cc395393dec420ca",
+    "source_metrics.csv": "4d9e953e14377cad4144b1ed06a4f9fff88db2ffdfa799a8dbded8fd01cc719e",
+    "source_predictions.csv": "97073261c5b29b813ac9716bb817e3a617d0afa6770f40b6faa3c00783b9b4e3"
+  }
+}

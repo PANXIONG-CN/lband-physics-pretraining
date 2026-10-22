@@ -1,0 +1,7 @@
+{
+  "selected_ridge": "ridge_alpha_100",
+  "alpha": 100.0,
+  "source_oof_rmse_db": 1.8807448838632836,
+  "source_oof_centered_skill": -0.06836523510463488,
+  "target_labels_opened_for_selection": false
+}

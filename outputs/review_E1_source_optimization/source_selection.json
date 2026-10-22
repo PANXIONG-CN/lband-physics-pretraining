@@ -1,0 +1,11 @@
+{
+  "selected": {
+    "optimizer_state": "inherited",
+    "effective_learning_rate": 0.003,
+    "epochs": 30,
+    "source_oof_rmse_db": 1.8875480663430282,
+    "source_oof_centered_skill": -0.0585458202369471
+  },
+  "selection_input": "source_validation_metrics.csv only; target labels not opened",
+  "selection_rule": "Minimum pooled out-of-field source validation RMSE (dB) of five-member ensemble across 12 candidates. Exact ties: fewer epochs, lower learning rate, inherited before reset."
+}
